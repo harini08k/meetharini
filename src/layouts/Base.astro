@@ -1,0 +1,78 @@
+---
+// Page wrapper for every page: <head> (title, description, social preview, canonical link), the Person data that tells
+// Google this site, LinkedIn, GitHub and YouTube are one person, the DevTools greeting, the skip link and the nav.
+// `theme="night"` is the scrapbook's dark look.
+import '../styles/global.css';
+import { site } from '../data/site';
+import Nav from '../components/Nav.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  theme?: 'day' | 'night';
+  profile?: boolean;
+}
+
+const { title = site.title, description = site.description, theme = 'day', profile = false } = Astro.props;
+const canonical = new URL(Astro.url.pathname, site.url).toString();
+const ogImage = new URL('/og.png', site.url).toString();
+
+// Tells Google that this site, LinkedIn, GitHub and YouTube all belong to the same person.
+const profileLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfilePage',
+  url: site.url,
+  mainEntity: {
+    '@type': 'Person',
+    name: site.name,
+    url: site.url,
+    jobTitle: 'AI full-stack developer',
+    email: `mailto:${site.email}`,
+    address: { '@type': 'PostalAddress', addressLocality: 'Chennai', addressCountry: 'IN' },
+    affiliation: { '@type': 'CollegeOrUniversity', name: 'Sri Venkateswara College of Engineering' },
+    knowsAbout: ['Full-stack development', 'Flutter', 'Serverpod', 'TypeScript', 'Generative AI'],
+    sameAs: [site.links.linkedin, site.links.github, site.links.youtube],
+  },
+};
+---
+
+<!doctype html>
+<html lang="en" data-theme={theme}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta name="theme-color" content={theme === 'night' ? '#1d2147' : '#f3f5f7'} />
+    <meta name="author" content={site.name} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    {profile && <script type="application/ld+json" set:html={JSON.stringify(profileLd)} />}
+
+    <script is:inline>
+      // A hello for anyone who opens DevTools.
+      console.log(
+        "%cOh hi, fellow dev.%c\nYou opened the console, so you're my kind of person.\nThis site's source is on GitHub: github.com/harini08k/meetharini\nI'm open to internships right now, so say hi: harini93331@gmail.com",
+        'font: 600 16px system-ui; color: #c21e6a',
+        'font: 13px system-ui; color: inherit'
+      );
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <Nav current={theme === 'night' ? 'scrapbook' : 'resume'} />
+    <slot />
+  </body>
+</html>

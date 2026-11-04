@@ -1,0 +1,40 @@
+---
+// Page not found.
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Page not found, Harini Karthikeyan" description="This page doesn't exist.">
+  <main id="main" class="lost">
+    <p class="lost__code">404</p>
+    <h1 class="lost__title">This page dropped out last minute.</h1>
+    <p class="lead">Even BenchCall couldn't find a replacement.</p>
+    <a class="btn btn--primary" href="/">Back home</a>
+  </main>
+</Base>
+
+<style>
+  .lost {
+    min-height: 90vh;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 80px 24px;
+    display: grid;
+    align-content: center;
+    justify-items: start;
+    gap: 6px;
+  }
+
+  .lost__code {
+    margin: 0;
+    font-weight: 700;
+    color: var(--silk);
+  }
+
+  .lost__title {
+    font-size: var(--step-5);
+    font-weight: 720;
+    font-stretch: 76%;
+    line-height: 0.98;
+    margin-bottom: 10px;
+  }
+</style>

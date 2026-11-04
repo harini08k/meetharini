@@ -1,0 +1,374 @@
+---
+// Top bar: section links, the Résumé / Scrapbook switch, ⌘K search and Recruiter mode.
+interface Props {
+  current: 'resume' | 'scrapbook';
+}
+const { current } = Astro.props;
+const links = [
+  ['Receipts', '/#receipts'],
+  ['Projects', '/#benchcall'],
+  ['Work', '/#work'],
+  ['Now', '/#now'],
+  ['About', '/#about'],
+];
+---
+
+<header class="nav">
+  <a class="nav__name" href="/">Harini Karthikeyan</a>
+
+  <nav class="nav__links" aria-label="Sections">
+    {links.map(([label, href]) => <a href={href}>{label}</a>)}
+  </nav>
+
+  <div class="nav__tools">
+    <button class="nav__btn" type="button" data-open-search aria-label="Search the site" aria-keyshortcuts="Control+K Meta+K">
+      <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M13 13l4.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span class="nav__kbd" data-kbd>Ctrl K</span>
+    </button>
+
+    {
+      current === 'resume' && (
+        <button class="nav__btn nav__recruiter" type="button" data-recruiter aria-pressed="false" title="A plain, fully open version for skimming">
+          Recruiter mode
+        </button>
+      )
+    }
+
+    <div class="switch" role="group" aria-label="Switch view">
+      <a href="/" aria-current={current === 'resume' ? 'page' : undefined}>Résumé</a>
+      <a href="/scrapbook/" aria-current={current === 'scrapbook' ? 'page' : undefined}>Scrapbook</a>
+    </div>
+  </div>
+</header>
+
+<dialog class="search" id="search" aria-label="Search the site">
+  <form method="dialog" class="search__bar">
+    <input id="search-q" type="search" placeholder="Search projects, posts, or that one thing you saw…" autocomplete="off" spellcheck="false" aria-controls="search-results" />
+    <button class="search__close" value="close" aria-label="Close search">Esc</button>
+  </form>
+  <ul class="search__results" id="search-results" role="listbox"></ul>
+  <p class="search__empty" id="search-empty" hidden>Nothing here yet. Honestly, that's a great idea for a post.</p>
+</dialog>
+
+<style>
+  .nav {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    height: 56px;
+    padding: 0 24px 0 20px;
+    background: color-mix(in srgb, var(--bg) 86%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid color-mix(in srgb, var(--rule) 70%, transparent);
+    font-size: var(--step--1);
+  }
+
+  .nav__name {
+    font-weight: 700;
+    font-stretch: 82%;
+    font-size: 1.0625rem;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .nav__links {
+    display: flex;
+    gap: 4px;
+    margin-left: 8px;
+  }
+
+  .nav__links a {
+    padding: 6px 10px;
+    border-radius: 999px;
+    color: var(--fg-2);
+    text-decoration: none;
+  }
+
+  .nav__links a:hover {
+    color: var(--fg);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+  }
+
+  .nav__tools {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .nav__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border: 1.5px solid var(--rule);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--fg-2);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .nav__btn:hover,
+  .nav__btn[aria-pressed='true'] {
+    color: var(--fg);
+    border-color: var(--accent);
+  }
+
+  .nav__btn[aria-pressed='true'] {
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+  }
+
+  .nav__kbd {
+    font-size: 0.8125rem;
+  }
+
+  .switch {
+    display: inline-flex;
+    padding: 3px;
+    border: 1.5px solid var(--rule);
+    border-radius: 999px;
+  }
+
+  .switch a {
+    padding: 4px 12px;
+    border-radius: 999px;
+    color: var(--fg-2);
+    text-decoration: none;
+  }
+
+  .switch a[aria-current='page'] {
+    background: var(--fg);
+    color: var(--bg);
+  }
+
+  /* ---- search dialog ---- */
+  .search {
+    width: min(620px, calc(100vw - 32px));
+    margin: 12vh auto 0;
+    padding: 0;
+    border: 1.5px solid var(--fg);
+    border-radius: var(--radius-m);
+    background: var(--surface);
+    color: var(--fg);
+    box-shadow: 0 24px 60px rgb(10 12 40 / 0.35);
+  }
+
+  .search::backdrop {
+    background: rgb(15 18 50 / 0.45);
+  }
+
+  .search__bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .search__bar input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: var(--step-1);
+    outline: none;
+  }
+
+  .search__bar input::-webkit-search-cancel-button {
+    display: none;
+  }
+
+  .search__close {
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--fg-2);
+    font: inherit;
+    font-size: 0.8125rem;
+    padding: 2px 8px;
+    cursor: pointer;
+  }
+
+  .search__results {
+    list-style: none;
+    margin: 0;
+    padding: 6px;
+    max-height: 52vh;
+    overflow: auto;
+  }
+
+  .search__results :global(a) {
+    display: block;
+    padding: 10px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+  }
+
+  .search__results :global(a:hover),
+  .search__results :global(a[aria-selected='true']) {
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+  }
+
+  .search__results :global(b) {
+    display: block;
+    font-weight: 650;
+  }
+
+  .search__results :global(small) {
+    color: var(--fg-2);
+  }
+
+  .search__empty {
+    margin: 0;
+    padding: 18px 16px 20px;
+    color: var(--fg-2);
+  }
+
+  @media (max-width: 960px) {
+    .nav__links,
+    .nav__kbd {
+      display: none;
+    }
+    .nav {
+      gap: 10px;
+      padding: 0 12px;
+    }
+    .nav__name {
+      font-size: 1rem;
+    }
+    .nav__recruiter {
+      display: none;
+    }
+  }
+
+  @media print {
+    .nav,
+    .search {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  // ---------- search ----------
+  type Item = { title: string; text: string; href: string; kind: string };
+  const dialog = document.getElementById('search') as HTMLDialogElement;
+  const input = document.getElementById('search-q') as HTMLInputElement;
+  const list = document.getElementById('search-results') as HTMLUListElement;
+  const empty = document.getElementById('search-empty') as HTMLElement;
+  let index: Item[] | null = null;
+  let active = -1;
+
+  const isMac = /Mac|iPhone|iPad/.test(navigator.platform);
+  document.querySelectorAll('[data-kbd]').forEach((el) => (el.textContent = isMac ? '⌘K' : 'Ctrl K'));
+
+  async function load() {
+    if (index) return;
+    try {
+      index = await (await fetch('/search.json')).json();
+    } catch {
+      index = [];
+    }
+  }
+
+  function esc(s: string) {
+    return s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+  }
+
+  function run() {
+    const q = input.value.trim().toLowerCase();
+    list.innerHTML = '';
+    active = -1;
+    if (!index || !q) {
+      empty.hidden = true;
+      return;
+    }
+    const words = q.split(/\s+/);
+    const hits = index
+      .map((it) => {
+        const t = it.title.toLowerCase();
+        const body = it.text.toLowerCase();
+        let score = 0;
+        for (const w of words) {
+          if (t.includes(w)) score += 5;
+          else if (body.includes(w)) score += 1;
+          else return { it, score: 0 };
+        }
+        return { it, score };
+      })
+      .filter((h) => h.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 8);
+    empty.hidden = hits.length > 0;
+    list.innerHTML = hits
+      .map(
+        ({ it }) =>
+          `<li role="presentation"><a role="option" href="${esc(it.href)}"><b>${esc(it.title)}</b><small>${esc(it.kind)}</small></a></li>`
+      )
+      .join('');
+  }
+
+  function move(delta: number) {
+    const opts = [...list.querySelectorAll('a')];
+    if (!opts.length) return;
+    active = (active + delta + opts.length) % opts.length;
+    opts.forEach((a, i) => a.setAttribute('aria-selected', String(i === active)));
+    opts[active].scrollIntoView({ block: 'nearest' });
+  }
+
+  async function open() {
+    if (!dialog.open) dialog.showModal();
+    input.focus();
+    input.select();
+    await load();
+    run();
+  }
+
+  document.querySelectorAll('[data-open-search]').forEach((b) => b.addEventListener('click', open));
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      dialog.open ? dialog.close() : open();
+    }
+  });
+  input.addEventListener('input', run);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown') (e.preventDefault(), move(1));
+    if (e.key === 'ArrowUp') (e.preventDefault(), move(-1));
+    if (e.key === 'Enter') {
+      const a = list.querySelectorAll('a')[Math.max(active, 0)] as HTMLAnchorElement | undefined;
+      if (a) location.href = a.href;
+    }
+  });
+  list.addEventListener('click', () => dialog.close());
+  dialog.addEventListener('click', (e) => {
+    if (e.target === dialog) dialog.close();
+  });
+
+  // ---------- recruiter mode ----------
+  const root = document.documentElement;
+  const btn = document.querySelector('[data-recruiter]') as HTMLButtonElement | null;
+  function setRecruiter(on: boolean) {
+    root.toggleAttribute('data-recruiter', on);
+    btn?.setAttribute('aria-pressed', String(on));
+    // Open everything so a skimmer sees every receipt and every file.
+    document.querySelectorAll('.page details').forEach((d) => ((d as HTMLDetailsElement).open = on));
+    if (on) {
+      document.querySelectorAll('.file__btn[aria-expanded="false"]').forEach((b) => (b as HTMLElement).click());
+    }
+    try {
+      localStorage.setItem('recruiter', on ? '1' : '0');
+    } catch {}
+  }
+  btn?.addEventListener('click', () => setRecruiter(btn.getAttribute('aria-pressed') !== 'true'));
+  try {
+    if (localStorage.getItem('recruiter') === '1') setRecruiter(true);
+  } catch {}
+</script>
