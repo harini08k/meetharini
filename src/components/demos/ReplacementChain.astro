@@ -1,0 +1,331 @@
+---
+const others = ['K', 'M', 'S', 'V', 'P', 'D', 'N', 'J'];
+---
+
+<!--
+  BenchCall explainer 1: the replacement chain. Five steps; each click advances `step`, which the CSS reads (data-step)
+  to move the roster dots and backups around. The script only swaps the caption and the button label.
+-->
+<div class="demo chain" data-step="0">
+  <div class="demo__head">
+    <h3 class="demo__title">The replacement chain</h3>
+    <p class="demo__hint">Click through what happens when someone drops out.</p>
+  </div>
+
+  <div class="demo__stage chain__stage">
+    <div class="game">
+      <p class="game__when">Friday, 8 PM. Turf booked for 10.</p>
+      <ol class="seats" aria-label="Game roster">
+        <li class="seat seat--org" title="Rohan, organizer">R</li>
+        <li class="seat seat--aditi" title="Aditi">A</li>
+        {others.map((o) => <li class="seat">{o}</li>)}
+      </ol>
+      <p class="game__count"><strong class="count-full">10 of 10</strong><strong class="count-short">9 of 10</strong> spots filled</p>
+    </div>
+
+    <div class="bench">
+      <p class="bench__label">Backups, in Rohan's order</p>
+      <ol class="bench__list">
+        <li class="backup backup--farhan">
+          <span class="backup__name">Farhan</span>
+          <span class="backup__state">
+            <svg class="ring" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle></svg>
+            <span class="st st--wait">Waiting</span>
+            <span class="st st--offer">Spot offered</span>
+            <span class="st st--no">Can't make it</span>
+          </span>
+        </li>
+        <li class="backup backup--isha">
+          <span class="backup__name">Isha</span>
+          <span class="backup__state">
+            <svg class="ring" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle></svg>
+            <span class="st st--wait">Waiting</span>
+            <span class="st st--offer">Spot offered</span>
+            <span class="st st--in">I'm in</span>
+          </span>
+        </li>
+      </ol>
+      <div class="money" aria-hidden="true">
+        <p class="money__line">Aditi's ₹300 share moves to Isha.</p>
+        <p class="money__alert">Rohan sees: refund Aditi ₹300.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="demo__foot">
+    <ol class="demo__dots" aria-hidden="true"><li></li><li></li><li></li><li></li><li></li></ol>
+    <p class="demo__text" aria-live="polite">Friday, 6 PM. Aditi can't make it.</p>
+    <button class="btn btn--primary demo__go" type="button">Drop out</button>
+  </div>
+</div>
+
+<style>
+  .chain__stage {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 22px;
+    align-items: start;
+  }
+
+  .game__when,
+  .bench__label {
+    margin: 0 0 10px;
+    font-size: var(--step--1);
+    color: var(--ink-3);
+  }
+
+  .seats {
+    display: grid;
+    grid-template-columns: repeat(5, 40px);
+    gap: 10px;
+    margin: 0 0 12px;
+    padding: 0;
+    list-style: none;
+  }
+
+  .seat {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--paper);
+    font-weight: 650;
+    font-size: 14px;
+    transition: background 300ms var(--ease), color 300ms var(--ease), box-shadow 300ms var(--ease);
+  }
+
+  .seat--org {
+    box-shadow: 0 0 0 3px var(--paper), 0 0 0 5px var(--zari);
+  }
+
+  .game__count {
+    margin: 0;
+    font-size: var(--step--1);
+    color: var(--ink-2);
+  }
+
+  .count-short {
+    display: none;
+    color: var(--danger);
+  }
+
+  .bench__list {
+    list-style: none;
+    margin: 0 0 12px;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+  }
+
+  .backup {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: var(--radius-s);
+    border: 1px solid var(--line);
+    background: var(--paper-2);
+    transition: border-color 240ms, background 240ms;
+  }
+
+  .backup__name {
+    font-weight: 600;
+  }
+
+  .backup__state {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--step--1);
+    color: var(--ink-3);
+  }
+
+  .st {
+    display: none;
+  }
+
+  .st--wait {
+    display: inline;
+  }
+
+  .ring {
+    width: 20px;
+    height: 20px;
+    display: none;
+    transform: rotate(-90deg);
+  }
+
+  .ring circle {
+    fill: none;
+    stroke: var(--silk);
+    stroke-width: 3;
+    stroke-dasharray: 57;
+    stroke-dashoffset: 0;
+  }
+
+  .money {
+    padding: 12px;
+    border-radius: var(--radius-s);
+    border: 1px dashed var(--peacock);
+    background: var(--peacock-tint);
+    color: #0a4f4e;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 300ms var(--ease), transform 300ms var(--ease);
+  }
+
+  .money p {
+    margin: 0;
+    font-size: var(--step--1);
+  }
+
+  .money__alert {
+    font-weight: 650;
+  }
+
+  /* step 1: Aditi out, Farhan offered */
+  .chain[data-step='1'] .seat--aditi,
+  .chain[data-step='2'] .seat--aditi {
+    background: transparent;
+    color: var(--danger);
+    box-shadow: inset 0 0 0 2px var(--danger);
+  }
+
+  .chain[data-step='1'] .count-full,
+  .chain[data-step='2'] .count-full {
+    display: none;
+  }
+
+  .chain[data-step='1'] .count-short,
+  .chain[data-step='2'] .count-short {
+    display: inline;
+  }
+
+  .chain[data-step='1'] .backup--farhan,
+  .chain[data-step='2'] .backup--isha {
+    border-color: var(--silk);
+    background: var(--silk-tint);
+  }
+
+  .chain[data-step='1'] .backup--farhan .ring,
+  .chain[data-step='2'] .backup--isha .ring {
+    display: block;
+  }
+
+  .chain[data-step='1'] .backup--farhan .ring circle,
+  .chain[data-step='2'] .backup--isha .ring circle {
+    animation: tick 6s linear forwards;
+  }
+
+  @keyframes tick {
+    to {
+      stroke-dashoffset: 57;
+    }
+  }
+
+  .chain[data-step='1'] .backup--farhan .st--wait,
+  .chain[data-step='2'] .backup--isha .st--wait {
+    display: none;
+  }
+
+  .chain[data-step='1'] .backup--farhan .st--offer,
+  .chain[data-step='2'] .backup--isha .st--offer {
+    display: inline;
+    color: var(--silk);
+    font-weight: 600;
+  }
+
+  /* step 2+: Farhan declined */
+  .chain:is([data-step='2'], [data-step='3'], [data-step='4']) .backup--farhan {
+    opacity: 0.55;
+  }
+
+  .chain:is([data-step='2'], [data-step='3'], [data-step='4']) .backup--farhan .st--wait {
+    display: none;
+  }
+
+  .chain:is([data-step='2'], [data-step='3'], [data-step='4']) .backup--farhan .st--no {
+    display: inline;
+    text-decoration: line-through;
+  }
+
+  /* step 3+: Isha in, game full */
+  .chain:is([data-step='3'], [data-step='4']) .seat--aditi {
+    background: var(--silk);
+    color: #fff;
+    font-size: 0;
+  }
+
+  .chain:is([data-step='3'], [data-step='4']) .seat--aditi::after {
+    content: 'I';
+    font-size: 14px;
+  }
+
+  .chain:is([data-step='3'], [data-step='4']) .backup--isha {
+    border-color: var(--peacock);
+  }
+
+  .chain:is([data-step='3'], [data-step='4']) .backup--isha .st--wait {
+    display: none;
+  }
+
+  .chain:is([data-step='3'], [data-step='4']) .backup--isha .st--in {
+    display: inline;
+    color: var(--peacock);
+    font-weight: 650;
+  }
+
+  .chain[data-step='4'] .money {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (max-width: 680px) {
+    .chain__stage {
+      grid-template-columns: 1fr;
+    }
+
+    .seats {
+      grid-template-columns: repeat(5, 36px);
+    }
+
+    .seat {
+      width: 36px;
+      height: 36px;
+    }
+  }
+</style>
+
+<script>
+  const steps = [
+    { text: "Friday, 6 PM. Aditi can't make it.", button: 'Drop out' },
+    { text: 'Her spot goes to the first backup, Farhan, with a countdown ticking.', button: "Farhan can't make it" },
+    { text: "Farhan can't make it either. Nobody has to notice: BenchCall moves on by itself.", button: 'Isha taps "I\'m in"' },
+    { text: 'Isha taps "I\'m in." The game is full again.', button: 'Show the money' },
+    {
+      text: "Even the money sorts itself out. Isha took Aditi's spot, so Rohan, the organizer, is told exactly who to refund.",
+      button: 'Replay',
+    },
+  ];
+
+  document.querySelectorAll<HTMLElement>('.chain').forEach((root) => {
+    const go = root.querySelector<HTMLButtonElement>('.demo__go')!;
+    const text = root.querySelector<HTMLElement>('.demo__text')!;
+    const dots = root.querySelectorAll('.demo__dots li');
+    let step = 0;
+    const render = () => {
+      root.dataset.step = String(step);
+      text.textContent = steps[step].text;
+      go.textContent = steps[step].button;
+      dots.forEach((d, i) => d.classList.toggle('is-on', i <= step));
+    };
+    go.addEventListener('click', () => {
+      step = (step + 1) % steps.length;
+      render();
+    });
+    render();
+  });
+</script>

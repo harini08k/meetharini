@@ -1,0 +1,90 @@
+---
+// ReachInbox Scheduler case study. Same shell as BenchCall; explainers are CrashWorker and HourlyLimit.
+import CaseStudy from '../../components/CaseStudy.astro';
+import CrashWorker from '../../components/demos/CrashWorker.astro';
+import HourlyLimit from '../../components/demos/HourlyLimit.astro';
+---
+
+<CaseStudy
+  title="ReachInbox Scheduler case study, Harini Karthikeyan"
+  description="How Harini built an email scheduler that sends exactly once, on time, even through crashes, with per-sender hourly limits."
+  name="ReachInbox Scheduler"
+  tagline="It sends your email at 3:00. Exactly once. Even if the server crashes at 2:59."
+  badges={['Hiring assignment', 'ReachInbox SDE intern']}
+  links={[
+    { label: 'Try the live demo', href: 'https://reachinbox-kohl-alpha.vercel.app' },
+    { label: 'Code on GitHub', href: 'https://github.com/harini08k/reachinbox' },
+    { label: 'Architecture', href: 'https://github.com/harini08k/reachinbox/blob/main/ARCHITECTURE.md' },
+    { label: 'Trade-offs', href: 'https://github.com/harini08k/reachinbox/blob/main/TRADEOFFS.md' },
+  ]}
+>
+  <section class="sec" data-knot>
+    <h2 class="sec-label">The brief</h2>
+    <div class="sec-body prose">
+      <p class="lead">
+        Build a production-grade email scheduler and dashboard: send emails in the future, enforce per-sender rate
+        limits, survive restarts without losing or duplicating anything, and stay honest about what's simplified.
+      </p>
+      <p class="muted">Free hosting naps when nobody's around. The first click on the live demo can take 30 to 60 seconds.</p>
+    </div>
+  </section>
+
+  <section class="sec" data-knot>
+    <h2 class="sec-label">What I built</h2>
+    <div class="sec-body prose">
+      <ul>
+        <li>
+          <strong>Scheduling with no cron.</strong> Every email is saved in Postgres first, then queued in BullMQ with a
+          delay. Right before sending, the worker re-reads the email from the database, so edits are never lost.
+        </li>
+        <li>
+          <strong>Crash safety.</strong> Redis writes queued jobs to disk, and each job's ID is the email's database ID. I
+          tested it by killing the worker mid-wait: the email still went out at the original time, once.
+        </li>
+        <li>
+          <strong>Rate limits that scale.</strong> An atomic Redis counter per sender per hour, plus a minimum gap between
+          sends and adjustable worker concurrency.
+        </li>
+        <li><strong>Slack alerts.</strong> A real Slack sign-in flow, and a message to your channel when a sender hits the limit.</li>
+        <li><strong>Search.</strong> Elasticsearch on my machine, with automatic fallback to Postgres search on the hosted version.</li>
+        <li>
+          <strong>Dashboard.</strong> Next.js with Google sign-in, Scheduled and Sent tabs with live counts, and a compose
+          window with CSV recipient upload, attachments and "Send later" time picks.
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="sec" data-knot>
+    <h2 class="sec-label">Try it</h2>
+    <div class="sec-body sec-body--wide" style="display:grid;gap:22px">
+      <CrashWorker />
+      <HourlyLimit />
+    </div>
+  </section>
+
+  <section class="sec" data-knot>
+    <h2 class="sec-label">The hard part</h2>
+    <div class="sec-body prose">
+      <p>
+        Making "exactly once, on time" true even when things crash. That came down to three decisions: Postgres as the
+        single source of truth, Redis persistence for the waiting jobs, and job IDs that make duplicates impossible.
+      </p>
+    </div>
+  </section>
+
+  <section class="sec" data-knot>
+    <h2 class="sec-label">Trade-offs I made on purpose</h2>
+    <div class="sec-body prose">
+      <ul>
+        <li>Sign-in shows your real Google identity, but you pick the sender from a small test list rather than one tied to your account.</li>
+        <li>The rich-text editor uses the browser's built-in editing instead of a library like TipTap.</li>
+        <li>Elasticsearch runs locally only, since I couldn't find a permanent free host for it.</li>
+      </ul>
+      <p class="muted">
+        Stack: TypeScript, Express, BullMQ, Redis, PostgreSQL with Prisma, Next.js 14, NextAuth, Tailwind, Slack OAuth,
+        Elasticsearch, Docker. Hosted on Vercel, Render, Neon and Upstash, all free tiers.
+      </p>
+    </div>
+  </section>
+</CaseStudy>

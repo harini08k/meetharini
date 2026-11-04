@@ -1,0 +1,94 @@
+---
+// BenchCall case study. The words are written out here; the explainers are the same components as on the homepage.
+import CaseStudy from '../../components/CaseStudy.astro';
+import ReplacementChain from '../../components/demos/ReplacementChain.astro';
+import LastSpotRace from '../../components/demos/LastSpotRace.astro';
+---
+
+<CaseStudy
+  title="BenchCall case study, Harini Karthikeyan"
+  description="How Harini built BenchCall solo: a turf game organizer that replaces last-minute dropouts by itself and settles who owes what. 5th place, Serverpod hackathon."
+  name="BenchCall"
+  tagline="Someone drops out at 6 PM. The game is still full by 8."
+  badges={['5th place', 'Build Something Real: The Serverpod Hackathon', 'Solo']}
+  links={[
+    { label: 'Watch the 2-min demo', href: 'https://www.youtube.com/watch?v=nLennJJJDGI' },
+    { label: 'Code on GitHub', href: 'https://github.com/harini08k/benchcall' },
+  ]}
+>
+  <section class="sec" data-knot>
+    <h2 class="sec-label">The problem</h2>
+    <div class="sec-body prose">
+      <p class="lead">
+        Every week, groups of friends book a turf for 5-a-side. The organizer pays the full fee upfront. Then someone
+        drops out at the last minute, the organizer begs for a replacement in the WhatsApp group, and afterwards chases
+        ₹300 from nine people over UPI.
+      </p>
+      <p>A real organizer summed it up for me: “Organizing our weekly game feels like a second job.”</p>
+    </div>
+  </section>
+
+  <section class="sec" data-knot>
+    <h2 class="sec-label">What I built</h2>
+    <div class="sec-body prose">
+      <ul>
+        <li>
+          <strong>Automatic replacements.</strong> The spot is offered to backups one at a time, in the organizer's order,
+          each with a countdown. When backups run out, nearby players at the right skill level get invited.
+        </li>
+        <li>
+          <strong>Money that settles itself.</strong> Each player's share comes from the turf fee, paid straight to the
+          organizer over UPI. A late dropout still owes their share unless someone replaces them.
+        </li>
+        <li><strong>One invite link.</strong> The organizer drops it in the group chat, and anyone who opens it joins.</li>
+        <li><strong>Weekly games.</strong> Next week's game creates itself and pings the regulars.</li>
+        <li>
+          <strong>Live everywhere.</strong> Rosters and money update on every screen with no refresh. It runs in the
+          browser, so there's nothing to install.
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="sec" data-knot>
+    <h2 class="sec-label">Try it</h2>
+    <div class="sec-body sec-body--wide" style="display:grid;gap:22px">
+      <ReplacementChain />
+      <LastSpotRace />
+    </div>
+  </section>
+
+  <section class="sec" data-knot>
+    <h2 class="sec-label">The hard part</h2>
+    <div class="sec-body prose">
+      <p>
+        Three things can collide: someone grabs the last spot, an invite times out, and next week's game gets generated.
+        Each one runs under a database lock, and the races have their own tests. Recurring games also have a unique rule
+        on series and start time, so the generator can never create the same Friday twice.
+      </p>
+    </div>
+  </section>
+
+  <section class="sec" data-knot>
+    <h2 class="sec-label">How I used AI</h2>
+    <div class="sec-body prose">
+      <p>
+        I built BenchCall with Claude Code on purpose, since the hackathon was about building with coding agents. My job
+        was everything around the code: finding and validating the problem, designing the flows and money rules, making
+        the architecture calls, and reviewing and testing every change.
+      </p>
+    </div>
+  </section>
+
+  <section class="sec" data-knot>
+    <h2 class="sec-label">Honest limitations</h2>
+    <div class="sec-body prose">
+      <p>
+        Notifications are in-app only for now; push and SMS are future work. Payments are self-reported on purpose,
+        because BenchCall never touches the money. The nearby-player pool needs real players nearby to shine, and it's
+        built and tested mainly for phone and desktop browsers.
+      </p>
+      <p class="muted">Stack: Flutter, Serverpod 4, PostgreSQL, Serverpod Cloud, streams, future calls, GitHub Actions CI.</p>
+    </div>
+  </section>
+</CaseStudy>

@@ -1,0 +1,203 @@
+<!--
+  ReachInbox explainer 2: the hourly limit. The button sends 50 emails at a time up to the 200 limit;
+  the next press shows email 201 waiting for the next hour. Reset starts again.
+-->
+<div class="demo limit">
+  <div class="demo__head">
+    <h3 class="demo__title">The hourly limit</h3>
+    <p class="demo__hint">One sender, a limit of 200 emails an hour.</p>
+  </div>
+
+  <div class="demo__stage limit__stage">
+    <div class="meter">
+      <div class="meter__top">
+        <span>This hour, 3:00 to 4:00</span>
+        <strong><span class="sent">0</span> of 200 sent</strong>
+      </div>
+      <div class="meter__bar" role="progressbar" aria-valuemin="0" aria-valuemax="200" aria-valuenow="0" aria-label="Emails sent this hour">
+        <span class="meter__fill"></span>
+      </div>
+      <p class="meter__counter">Redis counter <code>rate:sender-1:2026-11-04T15</code> = <span class="redis">0</span></p>
+    </div>
+
+    <div class="next">
+      <p class="next__label">Next hour, from 4:00</p>
+      <p class="next__queue">Nothing waiting</p>
+    </div>
+
+    <div class="slack" role="status">
+      <p class="slack__from">Slack, #alerts</p>
+      <p class="slack__msg">Sender 1 hit 200 emails this hour. Emails 201 to 250 moved to 4:00.</p>
+    </div>
+  </div>
+
+  <div class="demo__foot">
+    <p class="demo__text" aria-live="polite">Each sender has an hourly limit. Say 200.</p>
+    <div class="btn-row">
+      <button class="btn btn--primary demo__go" type="button">Send 50 emails</button>
+      <button class="btn btn--quiet demo__reset" type="button">Reset</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .limit__stage {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: 18px 22px;
+    align-items: start;
+  }
+
+  .meter {
+    grid-column: 1 / -1;
+  }
+
+  .meter__top {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+    font-size: var(--step--1);
+    color: var(--ink-2);
+  }
+
+  .meter__top strong {
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .meter__bar {
+    height: 18px;
+    border-radius: 999px;
+    background: var(--paper-2);
+    border: 1.5px solid var(--ink);
+    overflow: hidden;
+  }
+
+  .meter__fill {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: var(--silk);
+    transition: width 500ms var(--ease), background 300ms;
+  }
+
+  .limit.is-full .meter__fill {
+    background: var(--zari);
+  }
+
+  .meter__counter {
+    margin: 8px 0 0;
+    font-size: var(--step--1);
+    color: var(--ink-3);
+  }
+
+  .meter__counter code {
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: var(--paper-2);
+    border: 1px solid var(--line);
+  }
+
+  .next,
+  .slack {
+    padding: 12px 14px;
+    border-radius: var(--radius-s);
+    border: 1px solid var(--line);
+    background: var(--paper-2);
+  }
+
+  .next p,
+  .slack p {
+    margin: 0;
+  }
+
+  .next__label,
+  .slack__from {
+    font-size: var(--step--1);
+    color: var(--ink-3);
+  }
+
+  .next__queue {
+    font-weight: 600;
+  }
+
+  .limit.is-over .next {
+    border-color: var(--zari);
+  }
+
+  .slack {
+    border-left: 4px solid var(--silk);
+    border-radius: 0 var(--radius-s) var(--radius-s) 0;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 300ms var(--ease), transform 300ms var(--ease);
+  }
+
+  .limit.is-over .slack {
+    opacity: 1;
+    transform: none;
+  }
+
+  .slack__msg {
+    font-size: var(--step--1);
+  }
+
+  @media (max-width: 680px) {
+    .limit__stage {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.limit').forEach((root) => {
+    const go = root.querySelector<HTMLButtonElement>('.demo__go')!;
+    const reset = root.querySelector<HTMLButtonElement>('.demo__reset')!;
+    const text = root.querySelector<HTMLElement>('.demo__text')!;
+    const sent = root.querySelector<HTMLElement>('.sent')!;
+    const redis = root.querySelector<HTMLElement>('.redis')!;
+    const fill = root.querySelector<HTMLElement>('.meter__fill')!;
+    const bar = root.querySelector<HTMLElement>('.meter__bar')!;
+    const queue = root.querySelector<HTMLElement>('.next__queue')!;
+    let count = 0;
+
+    const render = () => {
+      sent.textContent = String(count);
+      redis.textContent = String(count);
+      fill.style.width = `${(count / 200) * 100}%`;
+      bar.setAttribute('aria-valuenow', String(count));
+      root.classList.toggle('is-full', count >= 200);
+    };
+
+    go.addEventListener('click', () => {
+      if (count < 200) {
+        count += 50;
+        render();
+        text.textContent =
+          count < 200
+            ? 'Every send bumps a Redis counter for that sender and that hour. Redis does it atomically, so even ten workers can\'t miscount.'
+            : 'That\'s 200. The limit is hit. Try sending 50 more.';
+        return;
+      }
+      root.classList.add('is-over');
+      queue.textContent = 'Emails 201 to 250, still scheduled';
+      text.textContent =
+        "Email 201 doesn't fail. It waits for the next hour, and Slack gets a ping that the limit was hit.";
+      go.disabled = true;
+    });
+
+    reset.addEventListener('click', () => {
+      count = 0;
+      root.classList.remove('is-over');
+      queue.textContent = 'Nothing waiting';
+      text.textContent = 'Each sender has an hourly limit. Say 200.';
+      go.disabled = false;
+      render();
+    });
+
+    render();
+  });
+</script>

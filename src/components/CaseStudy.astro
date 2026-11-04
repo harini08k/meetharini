@@ -1,0 +1,122 @@
+---
+// Shared page shell for the two case studies (BenchCall and ReachInbox).
+// The pages in src/pages/projects/ pass in the headline and sections and drop the matching explainers into the slot.
+import Base from '../layouts/Base.astro';
+import Thread from './Thread.astro';
+import Footer from './Footer.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  name: string;
+  tagline: string;
+  badges: string[];
+  links: { label: string; href: string }[];
+}
+const { title, description, name, tagline, badges, links } = Astro.props;
+---
+
+<Base title={title} description={description}>
+  <main id="main" class="page case">
+    <Thread />
+    <header class="sec case__head" data-knot>
+      <div class="case__back">
+        <a class="back" href="/">All of Harini's work</a>
+      </div>
+      <div class="sec-body sec-body--wide">
+        <ul class="chip-row case__badges">
+          {badges.map((b, i) => <li class={`chip ${i === 0 ? 'chip--award' : ''}`}>{b}</li>)}
+        </ul>
+        <h1 class="case__name">{name}</h1>
+        <p class="case__tagline">{tagline}</p>
+        <div class="btn-row">
+          {links.map((l, i) => <a class={`btn ${i === 0 ? 'btn--primary' : ''}`} href={l.href}>{l.label}</a>)}
+        </div>
+      </div>
+    </header>
+    <slot />
+    <span data-thread-end></span>
+    <Footer />
+  </main>
+</Base>
+
+<style>
+  .case__head {
+    padding-top: 40px;
+  }
+
+  .case__back {
+    grid-column: 1;
+    padding: 10px 16px 0 calc(var(--thread-x) + 30px);
+  }
+
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .back::before {
+    content: '';
+    width: 12px;
+    height: 12px;
+    border-left: 2px solid var(--silk);
+    border-bottom: 2px solid var(--silk);
+    transform: rotate(45deg);
+  }
+
+  .case__badges {
+    margin-bottom: 16px;
+  }
+
+  .chip--award {
+    border-color: var(--zari);
+    color: #7a5a14;
+    background: #fbf1da;
+    font-weight: 600;
+  }
+
+  .case__name {
+    font-size: var(--step-5);
+    font-weight: 720;
+    font-stretch: 76%;
+    line-height: 0.98;
+    margin-bottom: 14px;
+  }
+
+  .case__tagline {
+    font-size: var(--step-2);
+    font-weight: 600;
+    font-stretch: 86%;
+    line-height: 1.2;
+    max-width: 24em;
+    margin-bottom: 24px;
+  }
+
+  .case :global(.prose p),
+  .case :global(.prose li) {
+    max-width: 40em;
+  }
+
+  .case :global(.prose ul) {
+    padding-left: 1.1em;
+    margin: 0 0 1em;
+  }
+
+  .case :global(.prose li) {
+    margin-bottom: 0.5em;
+  }
+
+  .case :global(.prose strong) {
+    font-weight: 650;
+  }
+
+  @media (max-width: 960px) {
+    .case__back {
+      grid-column: 2;
+      padding: 0 0 20px;
+    }
+  }
+</style>

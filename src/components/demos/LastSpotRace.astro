@@ -1,0 +1,243 @@
+<!--
+  BenchCall explainer 2: the last-spot race. Two modes, naive and safe (BenchCall's version).
+  "Tap both at once" runs a short timed animation: the counter goes 9 → 10, then lands on 11 (naive) or stays at 10 (safe).
+  `data-phase` is ready, go or done and drives the CSS.
+-->
+<div class="demo race" data-mode="naive" data-phase="ready">
+  <div class="demo__head">
+    <h3 class="demo__title">The last-spot race</h3>
+    <div class="seg" role="group" aria-label="Which version">
+      <button type="button" aria-pressed="true" data-mode="naive">The naive version</button>
+      <button type="button" aria-pressed="false" data-mode="safe">BenchCall's version</button>
+    </div>
+  </div>
+
+  <div class="demo__stage race__stage">
+    <div class="lanes">
+      <div class="req req--a"><span>Player A taps "I'm in"</span></div>
+      <div class="req req--b"><span>Player B taps "I'm in"</span></div>
+    </div>
+    <div class="slotbox">
+      <svg class="lock" viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="5" y="10" width="14" height="10" rx="2"></rect>
+        <path d="M8 10V7a4 4 0 0 1 8 0v3"></path>
+      </svg>
+      <p class="slotbox__label">Friday's game</p>
+      <p class="slotbox__count"><span class="n">9</span> of 10</p>
+      <p class="slotbox__note"></p>
+    </div>
+  </div>
+
+  <div class="demo__foot">
+    <p class="demo__text" aria-live="polite">One spot left. Two people tap "I'm in" at the same moment.</p>
+    <button class="btn btn--primary demo__go" type="button">Tap both at once</button>
+  </div>
+</div>
+
+<style>
+  .race__stage {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 200px;
+    gap: 22px;
+    align-items: center;
+  }
+
+  .lanes {
+    display: grid;
+    gap: 18px;
+  }
+
+  .req {
+    position: relative;
+    height: 44px;
+    border-bottom: 1px dashed var(--line);
+  }
+
+  .req span {
+    position: absolute;
+    left: 0;
+    top: 4px;
+    display: inline-flex;
+    align-items: center;
+    height: 34px;
+    padding: 0 14px;
+    border-radius: 999px;
+    background: var(--ink);
+    color: var(--paper);
+    font-size: var(--step--1);
+    font-weight: 560;
+    white-space: nowrap;
+    transition: transform 700ms var(--ease), background 300ms, opacity 300ms;
+  }
+
+  .race[data-phase='go'] .req span,
+  .race[data-phase='done'] .req span {
+    transform: translateX(calc(var(--travel, 220px)));
+  }
+
+  .race[data-mode='safe'][data-phase='done'] .req--b span {
+    transform: translateX(0);
+    background: var(--ink-3);
+    opacity: 0.7;
+  }
+
+  .slotbox {
+    position: relative;
+    padding: 18px 16px;
+    border-radius: var(--radius-m);
+    border: 2px solid var(--ink);
+    background: var(--paper-2);
+    text-align: center;
+    transition: border-color 300ms, background 300ms;
+  }
+
+  .slotbox p {
+    margin: 0;
+  }
+
+  .slotbox__label {
+    font-size: var(--step--1);
+    color: var(--ink-3);
+  }
+
+  .slotbox__count {
+    font-size: var(--step-3);
+    font-weight: 700;
+    font-stretch: 80%;
+  }
+
+  .slotbox__note {
+    min-height: 1.4em;
+    font-size: var(--step--1);
+    font-weight: 600;
+  }
+
+  .lock {
+    position: absolute;
+    top: -14px;
+    right: -14px;
+    width: 34px;
+    height: 34px;
+    padding: 6px;
+    border-radius: 50%;
+    background: var(--peacock);
+    opacity: 0;
+    transform: scale(0.6);
+    transition: opacity 200ms, transform 200ms var(--ease);
+  }
+
+  .lock rect,
+  .lock path {
+    fill: none;
+    stroke: #fff;
+    stroke-width: 2;
+  }
+
+  .race[data-mode='safe']:is([data-phase='go'], [data-phase='done']) .lock {
+    opacity: 1;
+    transform: none;
+  }
+
+  .race[data-mode='naive'][data-phase='done'] .slotbox {
+    border-color: var(--danger);
+    background: #fbe9ea;
+  }
+
+  .race[data-mode='naive'][data-phase='done'] .slotbox__note {
+    color: var(--danger);
+  }
+
+  .race[data-mode='safe'][data-phase='done'] .slotbox {
+    border-color: var(--peacock);
+    background: var(--peacock-tint);
+  }
+
+  .race[data-mode='safe'][data-phase='done'] .slotbox__note {
+    color: #0a4f4e;
+  }
+
+  @media (max-width: 680px) {
+    .race__stage {
+      grid-template-columns: 1fr;
+    }
+
+    .race[data-phase='go'] .req span,
+    .race[data-phase='done'] .req span {
+      transform: translateX(24px);
+    }
+  }
+</style>
+
+<script>
+  const copy = {
+    naive: {
+      ready: 'One spot left. Two people tap "I\'m in" at the same moment.',
+      done: 'The naive version: both requests count 9 players and both say OK. Now 11 people show up for a 10-player game.',
+      note: '11 players. 10-player turf.',
+      count: '11',
+    },
+    safe: {
+      ready: 'Same race, BenchCall\'s version. Two people tap "I\'m in" at the same moment.',
+      done: 'The database locks the game\'s slots, so only one request can take the spot. The other is told it\'s gone. Covered by tests, because "it worked when I clicked it" isn\'t proof.',
+      note: "Full. Player B: the spot's gone.",
+      count: '10',
+    },
+  } as const;
+
+  document.querySelectorAll<HTMLElement>('.race').forEach((root) => {
+    const go = root.querySelector<HTMLButtonElement>('.demo__go')!;
+    const text = root.querySelector<HTMLElement>('.demo__text')!;
+    const n = root.querySelector<HTMLElement>('.n')!;
+    const note = root.querySelector<HTMLElement>('.slotbox__note')!;
+    const lanes = root.querySelector<HTMLElement>('.lanes')!;
+    const segs = root.querySelectorAll<HTMLButtonElement>('.seg button');
+    let timers: number[] = [];
+
+    const setTravel = () => {
+      const pill = root.querySelector<HTMLElement>('.req span')!;
+      root.style.setProperty('--travel', `${Math.max(0, lanes.clientWidth - pill.offsetWidth - 4)}px`);
+    };
+
+    const reset = () => {
+      timers.forEach(clearTimeout);
+      timers = [];
+      root.dataset.phase = 'ready';
+      n.textContent = '9';
+      note.textContent = '';
+      const mode = root.dataset.mode as 'naive' | 'safe';
+      text.textContent = copy[mode].ready;
+      go.textContent = 'Tap both at once';
+    };
+
+    segs.forEach((b) =>
+      b.addEventListener('click', () => {
+        root.dataset.mode = b.dataset.mode;
+        segs.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+        reset();
+      })
+    );
+
+    go.addEventListener('click', () => {
+      if (root.dataset.phase === 'done') return reset();
+      const mode = root.dataset.mode as 'naive' | 'safe';
+      setTravel();
+      root.dataset.phase = 'go';
+      go.disabled = true;
+      timers.push(
+        window.setTimeout(() => {
+          n.textContent = '10';
+        }, 650),
+        window.setTimeout(() => {
+          root.dataset.phase = 'done';
+          n.textContent = copy[mode].count;
+          note.textContent = copy[mode].note;
+          text.textContent = copy[mode].done;
+          go.textContent = 'Run it again';
+          go.disabled = false;
+        }, 1100)
+      );
+    });
+
+    window.addEventListener('resize', setTravel);
+  });
+</script>

@@ -1,0 +1,259 @@
+<!--
+  ReachInbox explainer 1: crash the worker. Six steps in a switch(step): schedule, wait, crash, restart, run, replay.
+  Each step updates the three boxes (email, Redis queue, worker), the clock and the little log.
+  The job ID and "sends total: 1" lines are the point: same ID after restart, so no duplicate.
+-->
+<div class="demo crash" data-phase="0">
+  <div class="demo__head">
+    <h3 class="demo__title">Crash the worker</h3>
+    <p class="demo__hint">An email has to go out at 3:00. Try to stop it.</p>
+  </div>
+
+  <div class="demo__stage crash__stage">
+    <div class="crash__clock" aria-label="Simulated time"><span class="t">2:57</span></div>
+    <div class="crash__parts">
+      <div class="part part--email">
+        <p class="part__name">The email</p>
+        <p class="part__state">Not scheduled yet</p>
+      </div>
+      <div class="part part--redis">
+        <p class="part__name">Redis queue</p>
+        <p class="part__state">Empty</p>
+      </div>
+      <div class="part part--worker">
+        <p class="part__name">Worker</p>
+        <p class="part__state">Running</p>
+      </div>
+    </div>
+    <ol class="crash__log" aria-label="Log"><li class="idle">Log is empty. Schedule something.</li></ol>
+  </div>
+
+  <div class="demo__foot">
+    <ol class="demo__dots" aria-hidden="true"><li></li><li></li><li></li><li></li><li></li></ol>
+    <p class="demo__text" aria-live="polite">Schedule an email for 3:00.</p>
+    <button class="btn btn--primary demo__go" type="button">Schedule it</button>
+  </div>
+</div>
+
+<style>
+  .crash__stage {
+    display: grid;
+    grid-template-columns: 150px minmax(0, 1fr);
+    grid-template-areas: 'clock parts' 'log log';
+    gap: 18px 22px;
+    align-items: center;
+  }
+
+  .crash__clock {
+    grid-area: clock;
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 2px solid var(--ink);
+    background: var(--paper-2);
+    font-size: var(--step-4);
+    font-weight: 700;
+    font-stretch: 78%;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .crash[data-phase='5'] .crash__clock {
+    border-color: var(--peacock);
+    color: var(--peacock);
+  }
+
+  .crash__parts {
+    grid-area: parts;
+    display: grid;
+    gap: 8px;
+  }
+
+  .part {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: var(--radius-s);
+    border: 1px solid var(--line);
+    background: var(--paper-2);
+    transition: border-color 240ms, background 240ms, opacity 240ms;
+  }
+
+  .part p {
+    margin: 0;
+  }
+
+  .part__name {
+    font-weight: 600;
+  }
+
+  .part__state {
+    font-size: var(--step--1);
+    color: var(--ink-3);
+  }
+
+  .part.is-hot {
+    border-color: var(--silk);
+    background: var(--silk-tint);
+  }
+
+  .part.is-down {
+    border-color: var(--danger);
+    background: #fbe9ea;
+  }
+
+  .part.is-down .part__state {
+    color: var(--danger);
+    font-weight: 600;
+  }
+
+  .part.is-good {
+    border-color: var(--peacock);
+    background: var(--peacock-tint);
+  }
+
+  .part.is-good .part__state {
+    color: #0a4f4e;
+    font-weight: 600;
+  }
+
+  .crash__log {
+    grid-area: log;
+    margin: 0;
+    padding: 12px 14px;
+    min-height: 92px;
+    border-radius: var(--radius-s);
+    background: var(--ink);
+    color: var(--chalk);
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.6;
+    list-style: none;
+  }
+
+  .crash__log li {
+    animation: log-in 220ms var(--ease);
+  }
+
+  .crash__log li.idle {
+    color: var(--chalk-2);
+  }
+
+  .crash__log li.bad {
+    color: #ff9aa2;
+  }
+
+  .crash__log li.ok {
+    color: #8fe3d7;
+  }
+
+  @keyframes log-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @media (max-width: 680px) {
+    .crash__stage {
+      grid-template-columns: 1fr;
+      grid-template-areas: 'clock' 'parts' 'log';
+    }
+
+    .crash__clock {
+      width: 120px;
+      justify-self: center;
+    }
+  }
+</style>
+
+<script>
+  type Part = 'email' | 'redis' | 'worker';
+  const steps = [
+    { text: 'Schedule an email for 3:00.', button: 'Schedule it' },
+    { text: 'It waits as a delayed job in Redis. No timers in my code, no cron.', button: 'Wait for it' },
+    { text: "It's 2:59. The email hasn't gone out yet.", button: 'Crash the worker' },
+    {
+      text: "The worker is down. Restart it: Redis kept the job safe on disk, and the job's ID is the email's own ID, so it can never be queued twice.",
+      button: 'Restart it',
+    },
+    { text: 'Worker is back and the job is still waiting. Now let the clock run.', button: 'Let it run' },
+    { text: '3:00. Sent. Once.', button: 'Replay' },
+  ];
+
+  document.querySelectorAll<HTMLElement>('.crash').forEach((root) => {
+    const go = root.querySelector<HTMLButtonElement>('.demo__go')!;
+    const text = root.querySelector<HTMLElement>('.demo__text')!;
+    const clock = root.querySelector<HTMLElement>('.t')!;
+    const log = root.querySelector<HTMLElement>('.crash__log')!;
+    const dots = root.querySelectorAll('.demo__dots li');
+    const part = (p: Part) => root.querySelector<HTMLElement>(`.part--${p}`)!;
+    const set = (p: Part, state: string, cls = '') => {
+      const el = part(p);
+      el.querySelector('.part__state')!.textContent = state;
+      el.className = `part part--${p} ${cls}`.trim();
+    };
+    const say = (time: string, line: string, cls = '') => {
+      const li = document.createElement('li');
+      li.textContent = `${time}  ${line}`;
+      if (cls) li.className = cls;
+      log.appendChild(li);
+    };
+    let step = 0;
+
+    const render = () => {
+      root.dataset.phase = String(step);
+      text.textContent = steps[step].text;
+      go.textContent = steps[step].button;
+      dots.forEach((d, i) => d.classList.toggle('is-on', i <= Math.min(step, 4)));
+    };
+
+    const run = () => {
+      switch (step) {
+        case 0:
+          log.replaceChildren();
+          clock.textContent = '2:58';
+          set('email', 'Saved in Postgres, due 3:00', 'is-hot');
+          set('redis', 'Delayed job #4821, 2 min');
+          say('2:58', 'email #4821 saved, status: scheduled');
+          say('2:58', 'job #4821 queued with a 120 s delay');
+          break;
+        case 1:
+          clock.textContent = '2:59';
+          set('redis', 'Job #4821 waiting, on disk', 'is-hot');
+          say('2:59', 'job #4821 still waiting (Redis AOF on disk)');
+          break;
+        case 2:
+          set('worker', 'Down', 'is-down');
+          say('2:59', 'worker process killed', 'bad');
+          break;
+        case 3:
+          set('worker', 'Running again', 'is-good');
+          say('2:59', 'worker restarted, reconnected to Redis', 'ok');
+          say('2:59', 'job #4821 found, same ID, no duplicate', 'ok');
+          break;
+        case 4:
+          clock.textContent = '3:00';
+          set('email', 'Sent once at 3:00', 'is-good');
+          set('redis', 'Job #4821 done', '');
+          say('3:00', 'email #4821 re-read from Postgres, sent', 'ok');
+          say('3:00', 'sends for #4821 total: 1', 'ok');
+          break;
+        case 5:
+          clock.textContent = '2:57';
+          log.replaceChildren();
+          say('', 'Log is empty. Schedule something.', 'idle');
+          set('email', 'Not scheduled yet');
+          set('redis', 'Empty');
+          set('worker', 'Running');
+          break;
+      }
+      step = step === 5 ? 0 : step + 1;
+      render();
+    };
+
+    go.addEventListener('click', run);
+    render();
+  });
+</script>
