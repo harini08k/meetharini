@@ -1,0 +1,223 @@
+---
+// The end of the thread. Click the tag, or drag it down more than 60px, and a night-coloured circle grows
+// from that spot and then the browser goes to /scrapbook. With reduced motion on, it just navigates.
+// A touch tap on the tag works too.
+---
+
+<section class="sec unravel" id="unravel" aria-label="The rest of me">
+  <div class="unravel__rail">
+    <span class="unravel__end" data-thread-end aria-hidden="true"></span>
+    <div class="tag" data-href="/scrapbook">
+      <p class="tag__note">That's the résumé version.</p>
+      <a class="tag__pull" href="/scrapbook" aria-label="Open the scrapbook: Harini's life, month by month">
+        Want the director's cut?
+      </a>
+      <p class="tag__hint">Click, or drag me down.</p>
+    </div>
+  </div>
+  <div class="sec-body unravel__body">
+    <p class="unravel__hover">Code, weekends, wins, flops and whatever I learned.</p>
+  </div>
+</section>
+
+<style>
+  .unravel {
+    padding-top: 24px;
+    padding-bottom: 96px;
+  }
+
+  .unravel__rail {
+    grid-column: 1;
+    position: relative;
+    padding-left: calc(var(--thread-x) - 1px);
+  }
+
+  .unravel__end {
+    display: block;
+    width: 2px;
+    height: 18px;
+  }
+
+  .tag {
+    position: relative;
+    width: 200px;
+    margin-left: -18px;
+    padding: 30px 18px 18px;
+    border-radius: 10px 10px 10px 10px;
+    background: var(--ink);
+    color: var(--chalk);
+    touch-action: none;
+    cursor: grab;
+    transform-origin: 18px 0;
+    animation: sway 4s ease-in-out infinite;
+    user-select: none;
+  }
+
+  .tag::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 12px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--bg);
+    box-shadow: inset 0 0 0 2px var(--thread);
+  }
+
+  .tag.is-dragging {
+    animation: none;
+    cursor: grabbing;
+  }
+
+  @keyframes sway {
+    0%,
+    100% {
+      transform: rotate(-2deg);
+    }
+    50% {
+      transform: rotate(2deg);
+    }
+  }
+
+  .tag__note {
+    margin: 0 0 6px;
+    font-size: var(--step--1);
+    color: var(--chalk-2);
+  }
+
+  .tag__pull {
+    display: block;
+    font-size: var(--step-2);
+    font-weight: 700;
+    font-stretch: 80%;
+    line-height: 1.05;
+    color: var(--silk-night);
+    text-decoration: none;
+  }
+
+  .tag__pull:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--silk-night);
+  }
+
+  .tag__hint {
+    margin: 10px 0 0;
+    font-size: 13px;
+    color: var(--chalk-2);
+  }
+
+  .unravel__body {
+    align-self: end;
+  }
+
+  .unravel__hover {
+    font-family: var(--hand);
+    font-size: var(--step-1);
+    color: var(--fg-2);
+    margin: 0;
+    max-width: 22em;
+  }
+
+  .night-curtain {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: var(--night);
+    pointer-events: none;
+  }
+
+  @media (max-width: 960px) {
+    .unravel__rail {
+      grid-column: 2;
+      padding-left: 0;
+    }
+
+    .tag {
+      margin-left: 0;
+    }
+
+    .unravel__body {
+      margin-top: 18px;
+    }
+  }
+</style>
+
+<script>
+  const tag = document.querySelector<HTMLElement>('.tag');
+  const link = tag?.querySelector<HTMLAnchorElement>('.tag__pull');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  let going = false;
+  function unravel(x: number, y: number, href: string) {
+    if (going) return;
+    going = true;
+    if (reduce) {
+      window.location.href = href;
+      return;
+    }
+    const curtain = document.createElement('div');
+    curtain.className = 'night-curtain';
+    curtain.style.background = '#1d2147';
+    curtain.style.position = 'fixed';
+    curtain.style.inset = '0';
+    curtain.style.zIndex = '100';
+    curtain.style.clipPath = `circle(0px at ${x}px ${y}px)`;
+    document.body.appendChild(curtain);
+    const r = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+    curtain
+      .animate([{ clipPath: `circle(0px at ${x}px ${y}px)` }, { clipPath: `circle(${r}px at ${x}px ${y}px)` }], {
+        duration: 650,
+        easing: 'cubic-bezier(0.65, 0, 0.35, 1)',
+        fill: 'forwards',
+      })
+      .finished.then(() => {
+        window.location.href = href;
+      });
+  }
+
+  if (tag && link) {
+    let startY = 0;
+    let dy = 0;
+    let dragging = false;
+
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const b = link.getBoundingClientRect();
+      unravel(b.left + b.width / 2, b.top + b.height / 2, link.href);
+    });
+
+    tag.addEventListener('pointerdown', (e) => {
+      if ((e.target as HTMLElement).closest('a') && e.pointerType === 'mouse') return;
+      dragging = true;
+      startY = e.clientY;
+      dy = 0;
+      tag.classList.add('is-dragging');
+      tag.setPointerCapture(e.pointerId);
+    });
+
+    tag.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      dy = Math.max(0, Math.min(140, e.clientY - startY));
+      tag.style.transform = `translateY(${dy}px)`;
+    });
+
+    const end = (e: PointerEvent) => {
+      if (!dragging) return;
+      dragging = false;
+      tag.classList.remove('is-dragging');
+      if (dy > 60) {
+        unravel(e.clientX, e.clientY, link.href);
+      } else {
+        tag.animate([{ transform: `translateY(${dy}px)` }, { transform: 'translateY(0)' }], {
+          duration: 380,
+          easing: 'cubic-bezier(0.3, 1.6, 0.5, 1)',
+        });
+        tag.style.transform = '';
+        if (dy < 6 && e.pointerType !== 'mouse') link.click();
+      }
+    };
+    tag.addEventListener('pointerup', end);
+    tag.addEventListener('pointercancel', end);
+  }
+</script>

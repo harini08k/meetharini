@@ -1,0 +1,122 @@
+---
+// The last résumé section: one paragraph, the quick facts list and the "Off the clock" sticky note.
+// Words come from quickFacts and offTheClock in src/data/resume.ts.
+import { quickFacts, offTheClock } from '../data/resume';
+import { site } from '../data/site';
+---
+
+<section class="sec" id="about" data-knot aria-labelledby="about-h">
+  <h2 class="sec-label" id="about-h">The short version</h2>
+  <div class="sec-body sec-body--wide">
+    <div class="about">
+      <div>
+        <p class="lead about__para">
+          I like problems that hurt a little: a friend's weekly football game, an email that has to land at exactly the
+          right minute. I find the real pain first, build the thing that removes it, then try very hard to break it before
+          anyone else can.
+        </p>
+        <ul class="facts">
+          {quickFacts.map((f) => <li>{f}</li>)}
+          <li>
+            YouTube: <a href={site.links.youtube}>@harini08k</a>. Mostly tech: my projects, demos, building things from
+            scratch and what it's actually like to use a tool. Now and then, something non-tech I'm passionate about.
+          </li>
+        </ul>
+      </div>
+
+      <aside class="clock" aria-labelledby="clock-h">
+        <span class="clock__tape" aria-hidden="true"></span>
+        <h3 class="clock__h" id="clock-h">Off the clock</h3>
+        <ul class="clock__list">
+          {offTheClock.map((o) => <li>{o}</li>)}
+        </ul>
+        <p class="clock__bridge">More of this behind the thread. Pull it.</p>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: 36px;
+    align-items: start;
+  }
+
+  .about__para {
+    margin-bottom: 22px;
+  }
+
+  .facts {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--rule);
+  }
+
+  .facts li {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--rule);
+    color: var(--fg-2);
+  }
+
+  .clock {
+    position: relative;
+    padding: 28px 24px 22px;
+    background: var(--night);
+    color: var(--chalk);
+    border-radius: 4px;
+    transform: rotate(1.2deg);
+    box-shadow: 0 1px 0 rgba(29, 33, 71, 0.08), 0 14px 30px -18px rgba(29, 33, 71, 0.55);
+  }
+
+  .clock__tape {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    width: 96px;
+    height: 24px;
+    transform: translateX(-50%) rotate(-3deg);
+    background: color-mix(in srgb, var(--zari) 55%, transparent);
+  }
+
+  .clock__h {
+    font-family: var(--hand);
+    font-weight: 700;
+    font-size: var(--step-2);
+    font-stretch: 100%;
+    color: var(--silk-night);
+    margin-bottom: 10px;
+  }
+
+  .clock__list {
+    margin: 0 0 14px;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 10px;
+  }
+
+  .clock__list li {
+    font-family: var(--hand);
+    font-size: 1.05rem;
+    line-height: 1.45;
+  }
+
+  .clock__bridge {
+    margin: 0;
+    font-size: var(--step--1);
+    color: var(--chalk-2);
+  }
+
+  @media (max-width: 760px) {
+    .about {
+      grid-template-columns: 1fr;
+    }
+
+    .clock {
+      transform: none;
+    }
+  }
+</style>

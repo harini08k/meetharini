@@ -1,0 +1,127 @@
+---
+// The silk thread down the left rail. It draws itself as you scroll and ties a knot
+// beside every section marked with data-knot. Without JavaScript it's a plain line.
+---
+
+<svg class="thread" aria-hidden="true" focusable="false">
+  <path class="thread__base" d=""></path>
+  <path class="thread__line" d=""></path>
+  <g class="thread__knots"></g>
+</svg>
+
+<style>
+  .thread {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 60px;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .thread__base {
+    fill: none;
+    stroke: color-mix(in srgb, var(--thread) 18%, transparent);
+    stroke-width: 2;
+  }
+
+  .thread__line {
+    fill: none;
+    stroke: var(--thread);
+    stroke-width: 2.25;
+    stroke-linecap: round;
+  }
+
+  .thread :global(.knot) {
+    fill: var(--bg);
+    stroke: var(--thread);
+    stroke-width: 2;
+    transition: fill 240ms ease;
+  }
+
+  .thread :global(.knot.is-tied) {
+    fill: var(--thread);
+  }
+</style>
+
+<script>
+  const NS = 'http://www.w3.org/2000/svg';
+
+  function setup(svg: SVGSVGElement) {
+    const host = svg.parentElement as HTMLElement;
+    const base = svg.querySelector('.thread__base') as SVGPathElement;
+    const line = svg.querySelector('.thread__line') as SVGPathElement;
+    const knotsG = svg.querySelector('.thread__knots') as SVGGElement;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let length = 0;
+    let knotYs: number[] = [];
+    let knotEls: SVGCircleElement[] = [];
+    let startY = 0;
+
+    function build() {
+      const x = parseFloat(getComputedStyle(host).getPropertyValue('--thread-x')) || 28;
+      const hostTop = host.getBoundingClientRect().top + window.scrollY;
+      const start = host.querySelector<Element>('[data-thread-start]');
+      const end = host.querySelector<Element>('[data-thread-end]');
+      const sr = start?.getBoundingClientRect();
+      const y0 = sr && sr.height > 0 ? sr.bottom + window.scrollY - hostTop : 0;
+      startY = y0;
+      const y1 = end ? end.getBoundingClientRect().top + window.scrollY - hostTop + 18 : host.scrollHeight;
+
+      knotYs = Array.from(host.querySelectorAll<HTMLElement>('[data-knot]')).map((el) => {
+        const label = el.querySelector<HTMLElement>('.sec-label');
+        const anchor = label && getComputedStyle(label).position === 'sticky' ? label : el;
+        return anchor.getBoundingClientRect().top + window.scrollY - hostTop + (anchor === el ? 6 : 14);
+      });
+
+      // A thread, not a ruler: a soft wobble between knots.
+      let d = `M ${x} ${y0}`;
+      const stops = [y0, ...knotYs.filter((y) => y > y0 && y < y1), y1];
+      for (let i = 1; i < stops.length; i++) {
+        const a = stops[i - 1];
+        const b = stops[i];
+        const m = (a + b) / 2;
+        const w = i % 2 ? 5 : -5;
+        d += ` C ${x + w} ${a + (m - a) * 0.6}, ${x - w} ${m + (b - m) * 0.4}, ${x} ${b}`;
+      }
+      base.setAttribute('d', d);
+      line.setAttribute('d', d);
+      length = line.getTotalLength();
+      line.style.strokeDasharray = `${length}`;
+
+      knotsG.replaceChildren();
+      knotEls = knotYs.map((y) => {
+        const c = document.createElementNS(NS, 'circle');
+        c.setAttribute('cx', String(x));
+        c.setAttribute('cy', String(y));
+        c.setAttribute('r', '6.5');
+        c.setAttribute('class', 'knot');
+        knotsG.appendChild(c);
+        return c;
+      });
+      paint();
+    }
+
+    function paint() {
+      const hostTop = host.getBoundingClientRect().top + window.scrollY;
+      const reach = reduce ? Infinity : window.scrollY + window.innerHeight * 0.62 - hostTop;
+      const drawn = Math.min(length, Math.max(0, reach - startY));
+      line.style.strokeDashoffset = `${length - drawn}`;
+      knotEls.forEach((k, i) => k.classList.toggle('is-tied', knotYs[i] <= reach));
+    }
+
+    let raf = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(paint);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    new ResizeObserver(() => build()).observe(host);
+    document.fonts?.ready.then(build);
+    build();
+  }
+
+  document.querySelectorAll<SVGSVGElement>('svg.thread').forEach(setup);
+</script>

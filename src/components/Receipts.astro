@@ -1,0 +1,135 @@
+---
+// Receipts: each claim is a native <details>; opening it shows the proof and a link.
+// Content is `receipts` in src/data/resume.ts. No JavaScript needed.
+import { receipts } from '../data/resume';
+---
+
+<section class="sec" id="receipts" data-knot aria-labelledby="receipts-h">
+  <h2 class="sec-label" id="receipts-h">
+    Receipts
+    <small>Anyone can write "hardworking" on a résumé. Here's the evidence.</small>
+  </h2>
+  <div class="sec-body">
+    <ul class="receipts">
+      {
+        receipts.map((r) => (
+          <li>
+            <details class="receipt">
+              <summary>
+                <span class="receipt__claim">{r.claim}</span>
+                <span class="receipt__toggle" aria-hidden="true" />
+              </summary>
+              <div class="receipt__proof">
+                <p>{r.proof}</p>
+                <a href={r.link.href}>{r.link.label}</a>
+              </div>
+            </details>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .receipts {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  .receipt {
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .receipt summary {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 20px 4px;
+    cursor: pointer;
+  }
+
+  .receipt summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .receipt__claim {
+    font-size: var(--step-2);
+    font-weight: 600;
+    font-stretch: 84%;
+    line-height: 1.15;
+  }
+
+  .receipt__toggle {
+    flex: none;
+    position: relative;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1.5px solid var(--silk);
+    transition: background 180ms var(--ease);
+  }
+
+  .receipt__toggle::before,
+  .receipt__toggle::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 12px;
+    height: 2px;
+    background: var(--silk);
+    transform: translate(-50%, -50%);
+    transition: transform 220ms var(--ease), background 180ms;
+  }
+
+  .receipt__toggle::after {
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+
+  .receipt summary:hover .receipt__toggle {
+    background: var(--silk-tint);
+  }
+
+  .receipt[open] .receipt__toggle {
+    background: var(--silk);
+  }
+
+  .receipt[open] .receipt__toggle::before,
+  .receipt[open] .receipt__toggle::after {
+    background: #fff;
+  }
+
+  .receipt[open] .receipt__toggle::after {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+
+  .receipt__proof {
+    padding: 0 56px 22px 4px;
+    max-width: 40em;
+    color: var(--fg-2);
+    animation: proof-in 260ms var(--ease);
+  }
+
+  .receipt__proof a {
+    font-weight: 560;
+    color: var(--fg);
+  }
+
+  @keyframes proof-in {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+  }
+
+  @media (max-width: 600px) {
+    .receipt__proof {
+      padding-right: 4px;
+    }
+  }
+</style>

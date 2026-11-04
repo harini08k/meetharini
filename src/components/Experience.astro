@@ -1,0 +1,228 @@
+---
+// "Work I can't show you": the two private projects as classified files.
+// The redacted words are black bars; Declassify reveals the case study. Content is `experience` in src/data/resume.ts.
+// Recruiter mode clicks every Declassify button for you (see Nav.astro).
+import { experience } from '../data/resume';
+---
+
+<section class="sec" id="work" data-knot aria-labelledby="work-h">
+  <h2 class="sec-label" id="work-h">
+    Work I can't show you
+    <small>But I can tell you about it.</small>
+  </h2>
+  <div class="sec-body">
+    <div class="files">
+      {
+        experience.map((e, i) => (
+          <article class="file">
+            <header class="file__head">
+              <div>
+                <h3 class="file__org">{e.org}</h3>
+                <p class="file__meta">
+                  <span>{e.role}</span>
+                  <span>{e.when}</span>
+                </p>
+              </div>
+              <span class="stamp" aria-hidden="true">Private, case study only</span>
+            </header>
+            <p class="file__redacted">
+              {e.redacted.map((w, j) => (j % 2 === 1 ? <mark class="bar">{w}</mark> : <span>{w}</span>))}
+            </p>
+            <button class="btn file__btn" type="button" aria-expanded="false" aria-controls={`file-${i}`}>
+              Declassify
+            </button>
+            <div class="file__body" id={`file-${i}`} hidden>
+              <p class="file__intro">{e.intro}</p>
+              <dl class="file__rows">
+                {e.rows.map(([k, v]) => (
+                  <div>
+                    <dt>{k}</dt>
+                    <dd>{v}</dd>
+                  </div>
+                ))}
+              </dl>
+              <p class="file__foot">
+                {e.footer.text} {e.footer.link && <a href={e.footer.link.href}>{e.footer.link.label}</a>}
+              </p>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .files {
+    display: grid;
+    gap: 18px;
+  }
+
+  .file {
+    position: relative;
+    padding: 22px 22px 20px;
+    border-radius: 4px var(--radius-m) var(--radius-m) var(--radius-m);
+    border: 1px solid var(--rule);
+    background:
+      linear-gradient(var(--surface), var(--surface)) padding-box,
+      var(--rule);
+  }
+
+  .file::before {
+    content: '';
+    position: absolute;
+    left: -1px;
+    top: -14px;
+    width: 120px;
+    height: 14px;
+    border: 1px solid var(--rule);
+    border-bottom: 0;
+    border-radius: 6px 6px 0 0;
+    background: var(--surface);
+  }
+
+  .file__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 16px;
+    margin-bottom: 14px;
+  }
+
+  .file__org {
+    font-size: var(--step-2);
+    font-stretch: 84%;
+  }
+
+  .file__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    margin: 4px 0 0;
+    color: var(--fg-2);
+    font-size: var(--step--1);
+  }
+
+  .stamp {
+    flex: none;
+    padding: 6px 10px;
+    border: 2px solid var(--silk);
+    border-radius: 4px;
+    color: var(--silk);
+    font-size: 13px;
+    font-weight: 700;
+    font-stretch: 80%;
+    line-height: 1.1;
+    max-width: 120px;
+    text-align: center;
+    transform: rotate(-5deg);
+    opacity: 0.85;
+  }
+
+  .file__redacted {
+    font-size: var(--step-1);
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  .file__redacted span::after {
+    content: ' ';
+  }
+
+  .bar {
+    color: transparent;
+    background: var(--ink);
+    border-radius: 2px;
+    padding: 0 2px;
+    margin-right: 0.3em;
+    background-image: linear-gradient(var(--ink), var(--ink));
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    background-position: right;
+    transition: color 400ms var(--ease) 200ms, background-size 500ms var(--ease);
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  .file.is-open .bar {
+    color: var(--silk);
+    background-color: transparent;
+    background-size: 0% 100%;
+    font-weight: 600;
+  }
+
+  .file__body {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px dashed var(--rule);
+    animation: open 300ms var(--ease);
+  }
+
+  .file__intro {
+    font-size: var(--step-0);
+  }
+
+  .file__rows {
+    display: grid;
+    gap: 12px;
+    margin: 0 0 14px;
+  }
+
+  .file__rows div {
+    display: grid;
+    grid-template-columns: 150px minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .file__rows dt {
+    font-weight: 600;
+  }
+
+  .file__rows dd {
+    margin: 0;
+    color: var(--fg-2);
+  }
+
+  .file__foot {
+    margin: 0;
+    font-size: var(--step--1);
+    color: var(--fg-2);
+  }
+
+  .file__foot a {
+    font-weight: 600;
+    color: var(--fg);
+  }
+
+  @keyframes open {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+  }
+
+  @media (max-width: 600px) {
+    .file__head {
+      flex-direction: column;
+    }
+
+    .file__rows div {
+      grid-template-columns: 1fr;
+      gap: 2px;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.file').forEach((file) => {
+    const btn = file.querySelector<HTMLButtonElement>('.file__btn')!;
+    const body = file.querySelector<HTMLElement>('.file__body')!;
+    btn.addEventListener('click', () => {
+      const open = btn.getAttribute('aria-expanded') !== 'true';
+      btn.setAttribute('aria-expanded', String(open));
+      btn.textContent = open ? 'Back to classified' : 'Declassify';
+      file.classList.toggle('is-open', open);
+      body.hidden = !open;
+    });
+  });
+</script>

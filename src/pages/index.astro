@@ -1,0 +1,75 @@
+---
+// The résumé page. Sections run top to bottom in the same order as the nav; Thread.astro draws the line down the left.
+// Copy for most sections lives in src/data/resume.ts.
+import Base from '../layouts/Base.astro';
+import Thread from '../components/Thread.astro';
+import Hero from '../components/Hero.astro';
+import Receipts from '../components/Receipts.astro';
+import Featured from '../components/Featured.astro';
+import ReplacementChain from '../components/demos/ReplacementChain.astro';
+import LastSpotRace from '../components/demos/LastSpotRace.astro';
+import CrashWorker from '../components/demos/CrashWorker.astro';
+import HourlyLimit from '../components/demos/HourlyLimit.astro';
+import MoreProjects from '../components/MoreProjects.astro';
+import Experience from '../components/Experience.astro';
+import Now from '../components/Now.astro';
+import Timeline from '../components/Timeline.astro';
+import About from '../components/About.astro';
+import Unravel from '../components/Unravel.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Base profile>
+  <main id="main" class="page">
+    <Thread />
+    <Hero />
+    <Receipts />
+
+    <Featured
+      id="benchcall"
+      name="BenchCall"
+      badges={['5th place', 'Build Something Real: The Serverpod Hackathon', 'Solo']}
+      tagline="Someone drops out at 6 PM. The game is still full by 8."
+      line="A turf game organizer that replaces last-minute dropouts by itself and settles who owes what."
+      stats={['1,000+ automated tests', 'Flutter + Serverpod', 'Built solo']}
+      actions={[
+        { label: 'Watch the 2-min demo', href: 'https://www.youtube.com/watch?v=nLennJJJDGI', primary: true },
+        { label: 'Read the case study', href: '/projects/benchcall' },
+        { label: 'Code on GitHub', href: 'https://github.com/harini08k/benchcall' },
+      ]}
+      image="IMG-03"
+      imageAlt="BenchCall on a phone, roster screen"
+    >
+      <ReplacementChain />
+      <LastSpotRace />
+    </Featured>
+
+    <Featured
+      id="reachinbox"
+      name="ReachInbox Scheduler"
+      badges={['Hiring assignment', 'ReachInbox SDE intern']}
+      tagline="It sends your email at 3:00. Exactly once. Even if the server crashes at 2:59."
+      line="An email scheduler with per-sender hourly limits that survives restarts without losing or doubling a single email."
+      stats={['No cron jobs', 'Crash-tested', 'Live Slack alerts']}
+      actions={[
+        { label: 'Try the live demo', href: 'https://reachinbox-kohl-alpha.vercel.app', primary: true },
+        { label: 'Read the case study', href: '/projects/reachinbox' },
+        { label: 'Code on GitHub', href: 'https://github.com/harini08k/reachinbox' },
+      ]}
+      note="Free hosting naps when nobody's around. The first click can take 30 to 60 seconds to wake it up."
+      image="IMG-05"
+      imageAlt="The ReachInbox dashboard"
+    >
+      <CrashWorker />
+      <HourlyLimit />
+    </Featured>
+
+    <MoreProjects />
+    <Experience />
+    <Now />
+    <Timeline />
+    <About />
+    <Unravel />
+    <Footer />
+  </main>
+</Base>

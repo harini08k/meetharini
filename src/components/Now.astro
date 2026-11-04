@@ -1,0 +1,59 @@
+---
+// The "Now" box. Rows with an empty value are left out. The data comes from src/data/now.json,
+// which is edited in the editor (Now box); change its date whenever you update it.
+import { now } from '../data/resume';
+---
+
+<section class="sec" id="now" data-knot aria-labelledby="now-h">
+  <h2 class="sec-label" id="now-h">
+    Now
+    <small>Updated {now.updated}</small>
+  </h2>
+  <div class="sec-body">
+    <dl class="now">
+      {
+        now.rows.map(([k, v]) => (
+          <div>
+            <dt>{k}</dt>
+            <dd>{v}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+</section>
+
+<style>
+  .now {
+    margin: 0;
+    display: grid;
+    gap: 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  .now div {
+    display: grid;
+    grid-template-columns: 160px minmax(0, 1fr);
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .now dt {
+    font-weight: 600;
+    color: var(--silk);
+  }
+
+  .now dd {
+    margin: 0;
+    font-size: var(--step-1);
+    line-height: 1.4;
+  }
+
+  @media (max-width: 600px) {
+    .now div {
+      grid-template-columns: 1fr;
+      gap: 2px;
+    }
+  }
+</style>

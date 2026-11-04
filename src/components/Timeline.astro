@@ -1,0 +1,251 @@
+---
+// Growth timeline. Each step lights up as it scrolls into view and adds its skills to the stack list beside it
+// (IntersectionObserver in the script below). "What I learned" opens on click.
+// Content is `timeline` in src/data/resume.ts; the `stack` of each step feeds the skill list.
+import { timeline } from '../data/resume';
+const allStack = [...new Set(timeline.flatMap((t) => t.stack))];
+---
+
+<section class="sec" id="growth" data-knot aria-labelledby="growth-h">
+  <h2 class="sec-label" id="growth-h">
+    How I got here
+    <small>From a to-do list to 1,000+ tests in about a year.</small>
+  </h2>
+  <div class="sec-body sec-body--wide">
+    <div class="growth">
+      <ol class="steps">
+        {
+          timeline.map((t, i) => (
+            <li class="step" data-stack={t.stack.join('|')}>
+              <p class="step__when">{t.when}</p>
+              <div class="step__card">
+                <h3 class="step__what">{t.what}</h3>
+                <p class="step__copy">{t.copy}</p>
+                {t.learned && (
+                  <>
+                    <button class="step__learn" type="button" aria-expanded="false" aria-controls={`learn-${i}`}>
+                      What I learned
+                    </button>
+                    <p class="step__learned" id={`learn-${i}`} hidden>
+                      {t.learned}
+                    </p>
+                  </>
+                )}
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+      <aside class="stack" aria-label="Skills picked up along the way">
+        <p class="stack__label">The stack, so far</p>
+        <ul class="stack__list">
+          {allStack.map((s) => <li data-skill={s}>{s}</li>)}
+        </ul>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<style>
+  .growth {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 200px;
+    gap: 32px;
+    align-items: start;
+  }
+
+  .steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+  }
+
+  .steps::before {
+    content: '';
+    position: absolute;
+    left: 104px;
+    top: 10px;
+    bottom: 10px;
+    width: 0;
+    border-left: 2px dotted color-mix(in srgb, var(--silk) 50%, transparent);
+  }
+
+  .step {
+    display: grid;
+    grid-template-columns: 92px minmax(0, 1fr);
+    gap: 28px;
+    padding: 10px 0;
+    position: relative;
+  }
+
+  .step::before {
+    content: '';
+    position: absolute;
+    left: 99px;
+    top: 18px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid var(--silk);
+    background: var(--bg);
+    transition: background 300ms;
+  }
+
+  .step.is-seen::before {
+    background: var(--silk);
+  }
+
+  .step__when {
+    margin: 0;
+    padding-top: 10px;
+    font-size: var(--step--1);
+    font-weight: 600;
+    color: var(--fg-2);
+    text-align: right;
+  }
+
+  .step__card {
+    padding: 10px 0 14px;
+  }
+
+  .step__what {
+    font-size: var(--step-1);
+    font-stretch: 86%;
+    margin-bottom: 4px;
+  }
+
+  .step__copy {
+    margin: 0 0 6px;
+    color: var(--fg-2);
+  }
+
+  .step__learn {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--silk);
+    font: inherit;
+    font-size: var(--step--1);
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-underline-offset: 3px;
+  }
+
+  .step__learned {
+    margin: 8px 0 0;
+    padding: 10px 14px;
+    border-radius: var(--radius-s);
+    background: var(--silk-tint);
+    color: var(--ink);
+    max-width: 34em;
+    animation: open 220ms var(--ease);
+  }
+
+  .stack {
+    position: sticky;
+    top: 24px;
+  }
+
+  .stack__label {
+    margin: 0 0 10px;
+    font-weight: 600;
+    font-size: var(--step--1);
+  }
+
+  .stack__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .stack__list li {
+    padding: 3px 10px;
+    border-radius: 999px;
+    border: 1px dashed var(--rule);
+    color: color-mix(in srgb, var(--fg-2) 55%, transparent);
+    font-size: var(--step--1);
+    transition: all 300ms var(--ease);
+  }
+
+  .stack__list li.is-on {
+    border: 1px solid var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  @keyframes open {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @media (max-width: 860px) {
+    .growth {
+      grid-template-columns: 1fr;
+    }
+
+    .stack {
+      display: none;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .steps::before {
+      left: 6px;
+    }
+
+    .step {
+      grid-template-columns: 1fr;
+      gap: 0;
+      padding-left: 28px;
+    }
+
+    .step::before {
+      left: 1px;
+      top: 14px;
+    }
+
+    .step__when {
+      text-align: left;
+      padding-top: 8px;
+    }
+
+    .step__card {
+      padding-top: 2px;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('.step__learn').forEach((b) => {
+    b.addEventListener('click', () => {
+      const p = document.getElementById(b.getAttribute('aria-controls')!)!;
+      const open = b.getAttribute('aria-expanded') !== 'true';
+      b.setAttribute('aria-expanded', String(open));
+      p.hidden = !open;
+    });
+  });
+
+  // Light up each skill once the step that taught it scrolls into view.
+  const skills = new Map<string, HTMLElement>();
+  document.querySelectorAll<HTMLElement>('.stack__list li').forEach((li) => skills.set(li.dataset.skill!, li));
+  const io = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        const el = e.target as HTMLElement;
+        el.classList.add('is-seen');
+        (el.dataset.stack || '').split('|').filter(Boolean).forEach((s) => skills.get(s)?.classList.add('is-on'));
+        io.unobserve(el);
+      });
+    },
+    { rootMargin: '0px 0px -35% 0px' }
+  );
+  document.querySelectorAll('.step').forEach((s) => io.observe(s));
+</script>

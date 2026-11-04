@@ -1,0 +1,138 @@
+---
+// A featured project: badges, tagline, buttons, a screenshot and the explainers (passed in through the slot).
+// Used twice on the homepage, for BenchCall and ReachInbox. The screenshot comes from Photo.astro by its IMG id.
+import Photo from './Photo.astro';
+interface Action {
+  label: string;
+  href: string;
+  primary?: boolean;
+}
+interface Props {
+  id: string;
+  name: string;
+  badges: string[];
+  tagline: string;
+  line: string;
+  stats: string[];
+  actions: Action[];
+  note?: string;
+  image: string;
+  imageAlt: string;
+}
+const { id, name, badges, tagline, line, stats, actions, note, image, imageAlt } = Astro.props;
+---
+
+<section class="sec feat" id={id} data-knot aria-labelledby={`${id}-h`}>
+  <h2 class="sec-label" id={`${id}-h`}>
+    {name}
+    <small>Featured project</small>
+  </h2>
+  <div class="sec-body sec-body--wide">
+    <ul class="chip-row feat__badges">
+      {badges.map((b, i) => <li class={`chip ${i === 0 ? 'chip--award' : ''}`}>{b}</li>)}
+    </ul>
+    <p class="feat__tagline">{tagline}</p>
+    <div class="feat__grid">
+      <div>
+        <p class="lead">{line}</p>
+        <ul class="feat__stats">
+          {stats.map((s) => <li>{s}</li>)}
+        </ul>
+        <div class="btn-row">
+          {actions.map((a) => <a class={`btn ${a.primary ? 'btn--primary' : ''}`} href={a.href}>{a.label}</a>)}
+        </div>
+        {note && <p class="feat__note">{note}</p>}
+      </div>
+      <figure class="feat__shot">
+        <Photo id={image} alt={imageAlt} />
+      </figure>
+    </div>
+    <div class="feat__demos">
+      <slot />
+    </div>
+  </div>
+</section>
+
+<style>
+  .feat__badges {
+    margin-bottom: 14px;
+  }
+
+  .chip--award {
+    border-color: var(--zari);
+    color: #7a5a14;
+    background: #fbf1da;
+    font-weight: 600;
+  }
+
+  .feat__tagline {
+    font-size: var(--step-4);
+    font-weight: 700;
+    font-stretch: 78%;
+    line-height: 1.02;
+    letter-spacing: -0.01em;
+    max-width: 16ch;
+    margin: 0 0 24px;
+    text-wrap: balance;
+  }
+
+  .feat__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: 28px;
+    align-items: start;
+    margin-bottom: 32px;
+  }
+
+  .feat__stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    margin: 6px 0 22px;
+    padding: 0;
+    list-style: none;
+    color: var(--fg-2);
+    font-size: var(--step--1);
+  }
+
+  .feat__stats li {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .feat__stats li::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    border: 1.5px solid var(--silk);
+  }
+
+  .feat__note {
+    margin-top: 12px;
+    font-size: var(--step--1);
+    color: var(--fg-2);
+    max-width: 30em;
+  }
+
+  .feat__shot {
+    margin: 0;
+  }
+
+  .feat__shot .ph {
+    border-radius: var(--radius-m);
+    aspect-ratio: 4 / 3.2;
+  }
+
+  .feat__demos {
+    display: grid;
+    gap: 22px;
+  }
+
+  @media (max-width: 760px) {
+    .feat__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

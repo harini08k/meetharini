@@ -1,0 +1,300 @@
+---
+import { existsSync } from 'node:fs';
+import { site } from '../data/site';
+
+// The kolam: one unbroken line weaving through a grid of dots,
+// then dropping into the rail as the thread that runs down the whole site.
+const cols = 4;
+const rows = 4;
+const s = 44;
+const a = 13;
+const x0 = 28;
+const y0 = 30;
+const X = (c: number) => x0 + c * s;
+const Y = (r: number) => y0 + r * s;
+const sign = (c: number, r: number) => ((c + r) % 2 === 0 ? -1 : 1);
+
+let d = `M ${x0} 0 L ${x0} ${Y(0) - a}`;
+for (let r = 0; r < rows; r++) {
+  const ltr = r % 2 === 0;
+  const order = ltr ? [...Array(cols).keys()] : [...Array(cols).keys()].reverse();
+  for (let i = 1; i < order.length; i++) {
+    const pc = order[i - 1];
+    const c = order[i];
+    const py = Y(r) + a * sign(pc, r);
+    const y = Y(r) + a * sign(c, r);
+    const dx = (X(c) - X(pc)) / 2;
+    d += ` C ${X(pc) + dx} ${py}, ${X(c) - dx} ${y}, ${X(c)} ${y}`;
+  }
+  if (r < rows - 1) {
+    const c = order[order.length - 1];
+    const yFrom = Y(r) + a * sign(c, r);
+    const yTo = Y(r + 1) + a * sign(c, r + 1);
+    const out = ltr ? 40 : -40;
+    d += ` C ${X(c) + out} ${yFrom}, ${X(c) + out} ${yTo}, ${X(c)} ${yTo}`;
+  }
+}
+const H = Y(rows - 1) + 64;
+d += ` L ${x0} ${H}`;
+const dots = Array.from({ length: rows * cols }, (_, i) => ({ cx: X(i % cols), cy: Y(Math.floor(i / cols)) }));
+
+const email = site.email.split('@');
+// The button appears once public/resume.pdf exists.
+const hasResume = existsSync(new URL('../../public/resume.pdf', import.meta.url));
+---
+
+<header class="sec hero" id="top">
+  <div class="hero__rail">
+    <svg class="kolam" data-thread-start viewBox={`0 0 ${x0 + (cols - 1) * s + 48} ${H}`} width={x0 + (cols - 1) * s + 48} height={H} aria-hidden="true">
+      {dots.map((p) => <circle class="kolam__dot" cx={p.cx} cy={p.cy} r="3.2" />)}
+      <path class="kolam__line" d={d} pathLength="1" />
+    </svg>
+  </div>
+
+  <div class="sec-body hero__body">
+    <div class="hero__hello">
+      <span class="avatar" aria-hidden="true">HK</span>
+      <p>Hi, I'm Harini Karthikeyan.</p>
+    </div>
+
+    <h1 class="hero__title">I build software that keeps its promises. Even at 6&nbsp;PM on a&nbsp;Friday.</h1>
+
+    <p class="hero__sub">
+      AI full-stack developer and CSE student at SVCE, Chennai. Placed 5th, solo, in Serverpod's Build Something Real
+      hackathon. Currently building an AI exam proctoring system.
+    </p>
+
+    <div class="status">
+      <button class="status__chip" type="button" aria-describedby="status-more">
+        <span class="status__dot" aria-hidden="true"></span>
+        Open to internships, now and 2027
+      </button>
+      <span class="status__more" id="status-more" role="tooltip">
+        SDE, full-stack, backend, mobile or AI. If it's an internship and it's open, I want to hear about it.
+      </span>
+    </div>
+
+    <div class="btn-row hero__actions">
+      {hasResume && <a class="btn btn--primary" href={site.resume}>Résumé (PDF)</a>}
+      <a class="btn" href={site.links.github} rel="me">GitHub</a>
+      <a class="btn" href={site.links.linkedin} rel="me">LinkedIn</a>
+      <a class="btn" href={site.links.youtube} rel="me">YouTube</a>
+      <button class="btn say-hi" type="button" data-u={email[0]} data-d={email[1]}>Say hi</button>
+    </div>
+    <p class="say-hi__note" aria-live="polite"></p>
+
+    <p class="hero__hint">Scroll for the work. Pull the thread at the bottom for the rest of me.</p>
+  </div>
+</header>
+
+<style>
+  .hero {
+    padding-top: 56px;
+    padding-bottom: 40px;
+    min-height: min(92vh, 860px);
+    align-content: center;
+  }
+
+  .hero__rail {
+    grid-column: 1;
+    position: relative;
+  }
+
+  .kolam {
+    overflow: visible;
+  }
+
+  .kolam__dot {
+    fill: var(--ink-3);
+    opacity: 0;
+    animation: dot-in 500ms var(--ease) forwards;
+  }
+
+  .kolam__line {
+    fill: none;
+    stroke: var(--thread);
+    stroke-width: 2.25;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw 2.4s var(--ease) 350ms forwards;
+  }
+
+  @keyframes dot-in {
+    to {
+      opacity: 0.55;
+    }
+  }
+
+  @keyframes draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  .hero__body {
+    max-width: 820px;
+  }
+
+  .hero__hello {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    font-size: var(--step-1);
+    font-weight: 500;
+  }
+
+  .hero__hello p {
+    margin: 0;
+  }
+
+  .avatar {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid var(--silk);
+    background: var(--silk-tint);
+    color: var(--silk);
+    font-weight: 700;
+    font-size: 15px;
+    font-stretch: 90%;
+  }
+
+  .hero__title {
+    font-size: var(--step-5);
+    font-weight: 720;
+    font-stretch: 76%;
+    line-height: 0.98;
+    letter-spacing: -0.012em;
+    max-width: 13ch;
+    margin-bottom: 26px;
+  }
+
+  .hero__sub {
+    font-size: var(--step-1);
+    line-height: 1.45;
+    color: var(--fg-2);
+    max-width: 34em;
+    margin-bottom: 26px;
+  }
+
+  .status {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 22px;
+  }
+
+  .status__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    min-height: 36px;
+    padding: 0 14px;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--peacock) 40%, transparent);
+    background: var(--peacock-tint);
+    color: #0a4f4e;
+    font: inherit;
+    font-size: var(--step--1);
+    font-weight: 560;
+    cursor: help;
+  }
+
+  .status__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--peacock);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--peacock) 50%, transparent);
+    animation: pulse 2.4s ease-out infinite;
+  }
+
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 0 0 color-mix(in srgb, var(--peacock) 45%, transparent);
+    }
+    70%,
+    100% {
+      box-shadow: 0 0 0 8px transparent;
+    }
+  }
+
+  .status__more {
+    position: absolute;
+    left: 0;
+    top: calc(100% + 8px);
+    width: min(340px, 80vw);
+    padding: 12px 14px;
+    border-radius: var(--radius-m);
+    background: var(--ink);
+    color: var(--chalk);
+    font-size: var(--step--1);
+    line-height: 1.45;
+    opacity: 0;
+    transform: translateY(-4px);
+    pointer-events: none;
+    transition: opacity 160ms var(--ease), transform 160ms var(--ease);
+    z-index: 5;
+  }
+
+  .status__chip:hover + .status__more,
+  .status__chip:focus-visible + .status__more,
+  .status.is-open .status__more {
+    opacity: 1;
+    transform: none;
+  }
+
+  .hero__actions {
+    margin-bottom: 8px;
+  }
+
+  .say-hi__note {
+    min-height: 1.5em;
+    font-size: var(--step--1);
+    color: var(--fg-2);
+    margin: 4px 0 18px;
+  }
+
+  .hero__hint {
+    font-size: var(--step--1);
+    color: var(--fg-2);
+    margin: 0;
+  }
+
+  @media (max-width: 960px) {
+    .hero__rail {
+      display: none;
+    }
+
+    .hero {
+      min-height: auto;
+      padding-top: 40px;
+    }
+
+    .hero__body {
+      grid-column: 2;
+    }
+  }
+</style>
+
+<script>
+  const btn = document.querySelector<HTMLButtonElement>('.say-hi');
+  const note = document.querySelector<HTMLElement>('.say-hi__note');
+  btn?.addEventListener('click', async () => {
+    const addr = `${btn.dataset.u}@${btn.dataset.d}`;
+    try {
+      await navigator.clipboard.writeText(addr);
+      if (note) note.textContent = `Copied ${addr}. Opening your email app too.`;
+    } catch {
+      if (note) note.textContent = addr;
+    }
+    window.location.href = `mailto:${addr}`;
+  });
+
+  const status = document.querySelector<HTMLElement>('.status');
+  status?.querySelector('button')?.addEventListener('click', () => status.classList.toggle('is-open'));
+</script>
