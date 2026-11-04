@@ -45,7 +45,7 @@ astro.config.mjs      integrations; the editor and the Cloudflare adapter are op
 | `Thread.astro` | Measures the page, draws the line and ties a knot at every element marked `data-knot`. Without JavaScript it's a plain line. |
 | `Hero.astro` | The kolam (one unbroken line through a grid of dots) that runs into the thread, the headline and the status chip. |
 | `Receipts.astro` | Claims that open to show proof. Plain `<details>`, no script. |
-| `Featured.astro` + `demos/*` | A project card with its click-through explainers in the slot. |
+| `Featured.astro` + `demos/*` | A project card with its click-through explainers in the slot. The two BenchCall explainers are drawn in the app's own look (its colours, fonts and copy, taken from BenchCall's `theme.dart` and `design/ui-proposal`), so they read as the real app. |
 | `Experience.astro` | The classified-file cards. Declassify reveals the case study. |
 | `Timeline.astro` | Steps light up on scroll (IntersectionObserver) and add their skills to the stack list. |
 | `Unravel.astro` | The pull tag. Click or drag, a night-coloured circle grows, then it navigates to `/scrapbook`. |

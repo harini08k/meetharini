@@ -1,53 +1,147 @@
 ---
-const others = ['K', 'M', 'S', 'V', 'P', 'D', 'N', 'J'];
+// The phone below is a replica of BenchCall's real screens (the "Matchday night" theme from the app's
+// design/ui-proposal): striped pitch green, the lime DEMO bar, the countdown clock, the split-flap counter
+// and the cream money cards. Same fonts, same colours, same copy as the app.
+import '@fontsource/barlow-condensed/700.css';
+import '@fontsource/barlow-condensed/800.css';
+import '@fontsource-variable/manrope/wght.css';
+import '@fontsource/jetbrains-mono/latin-700.css';
+
+const roster = ['Dev', 'Priya', 'Arjun', 'Nikhil'];
 ---
 
 <!--
-  BenchCall explainer 1: the replacement chain. Five steps; each click advances `step`, which the CSS reads (data-step)
-  to move the roster dots and backups around. The script only swaps the caption and the button label.
+  BenchCall explainer 1: the replacement chain. Five steps, one phone screen each.
+  Each click moves `data-step` on the root; CSS shows the matching [data-screen]. The script keeps the caption,
+  button label, scoreboard and "behind the screen" list in step, and runs the countdown on screens 1 and 2.
+  The phone is a picture of the app, so it is hidden from screen readers; the caption below says what happens.
 -->
 <div class="demo chain" data-step="0">
   <div class="demo__head">
     <h3 class="demo__title">The replacement chain</h3>
-    <p class="demo__hint">Click through what happens when someone drops out.</p>
+    <p class="demo__hint">Click through what happens when someone drops out. The screens are the real app.</p>
   </div>
 
   <div class="demo__stage chain__stage">
-    <div class="game">
-      <p class="game__when">Friday, 8 PM. Turf booked for 10.</p>
-      <ol class="seats" aria-label="Game roster">
-        <li class="seat seat--org" title="Rohan, organizer">R</li>
-        <li class="seat seat--aditi" title="Aditi">A</li>
-        {others.map((o) => <li class="seat">{o}</li>)}
-      </ol>
-      <p class="game__count"><strong class="count-full">10 of 10</strong><strong class="count-short">9 of 10</strong> spots filled</p>
+    <div class="phone" aria-hidden="true">
+      <div class="phone__screen app">
+        <!-- 0: Aditi taps Drop out -->
+        <section data-screen="0" class="scr">
+          <div class="demobar"><span class="demobar__tag">DEMO</span><span class="demobar__who">You are Aditi (Regular)</span><span class="demobar__switch">Switch</span></div>
+          <header class="appbar">
+            <span class="appbar__back">←</span><span class="disp appbar__title">Game</span>
+            <span class="live"><i></i>LIVE</span>
+          </header>
+          <div class="rosterbox">
+            {roster.map((n, i) => <div class="slot"><span class="num">{7 + i}</span><span class="pname">{n}</span></div>)}
+          </div>
+          <div class="pad"><span class="outline outline--danger">Drop out</span></div>
+          <p class="lbl pad">MONEY</p>
+          <div class="paper pad-in">
+            <div class="paper__row"><span class="lbl lbl--dark">YOUR SHARE</span><span class="chip chip--paid">Paid</span></div>
+            <div class="disp big">₹300</div>
+            <p class="paper__text">Rohan confirmed your payment. All square.</p>
+          </div>
+          <div class="dim"></div>
+          <div class="dialog">
+            <h4 class="disp dialog__h">Drop out?</h4>
+            <p>It's past the drop-out cutoff, so you'll still owe your share unless a replacement takes your spot. We'll start looking right away.</p>
+            <div class="dialog__row"><span>Stay in</span><span class="pill pill--danger">Drop out</span></div>
+          </div>
+        </section>
+
+        <!-- 1 and 2: a backup gets the spot, with two minutes to answer -->
+        {
+          [
+            { n: 1, who: 'You are Farhan (Backup 1)' },
+            { n: 2, who: 'You are Isha (Backup 2)' },
+          ].map((s) => (
+            <section data-screen={s.n} class="scr" hidden>
+              <div class="demobar"><span class="demobar__tag">DEMO</span><span class="demobar__who">{s.who}</span><span class="demobar__switch">Switch</span></div>
+              <header class="appbar"><span class="appbar__back">←</span><span class="disp appbar__title">Spot open</span></header>
+              <div class="pad">
+                <h4 class="disp venue">Kick Off Arena</h4>
+                <p class="where">Koramangala, Bengaluru · Friday · 8:00 PM</p>
+              </div>
+              <div class="clock" data-clock>
+                <div class="clock__digits">
+                  <span class="flap flap--l" data-m>2</span>
+                  <span class="disp colon">:</span>
+                  <span class="flap flap--l" data-s1>0</span>
+                  <span class="flap flap--l" data-s2>0</span>
+                </div>
+                <div class="clock__track"><div data-bar></div></div>
+                <span class="clock__lbl">TO ANSWER</span>
+              </div>
+              <p class="lead pad">Someone dropped out. Take their spot before the time runs out, or decline so we can ask the next player.</p>
+              <div class="pad stack">
+                <span class="cta">✓ I'm in</span>
+                <span class="outline outline--line">Can't make it</span>
+              </div>
+            </section>
+          ))
+        }
+
+        <!-- 3: Isha is in -->
+        <section data-screen="3" class="scr" hidden>
+          <div class="demobar"><span class="demobar__tag">DEMO</span><span class="demobar__who">You are Isha (Backup 2)</span><span class="demobar__switch">Switch</span></div>
+          <header class="appbar"><span class="appbar__back">←</span><span class="disp appbar__title">Spot open</span></header>
+          <div class="pad">
+            <h4 class="disp venue">Kick Off Arena</h4>
+            <p class="where">Koramangala, Bengaluru · Friday · 8:00 PM</p>
+          </div>
+          <div class="pad youre">
+            <h4 class="disp stamp">You're in.</h4>
+            <p class="lead">The spot is yours. The roster has been updated for everyone.</p>
+            <span class="cta cta--auto">Go to the game</span>
+            <span class="textlink">See who is playing</span>
+          </div>
+        </section>
+
+        <!-- 4: Rohan's money card -->
+        <section data-screen="4" class="scr" hidden>
+          <div class="demobar"><span class="demobar__tag">DEMO</span><span class="demobar__who">You are Rohan (Organizer)</span><span class="demobar__switch">Switch</span></div>
+          <header class="appbar">
+            <span class="appbar__back">←</span><span class="disp appbar__title">Game</span>
+            <span class="live"><i></i>LIVE</span>
+          </header>
+          <div class="board">
+            <span class="flap flap--l">10</span><span class="disp slash">/</span><span class="flap flap--l flap--w">10</span>
+            <span class="disp board__txt">FULL. GAME ON.</span>
+          </div>
+          <p class="lbl pad">MONEY</p>
+          <div class="note">You owe ₹300 in refunds. BenchCall can't send money: refund over UPI, then tap Mark refunded.</div>
+          <div class="paper pad-in">
+            <div class="paper__row"><span class="who">Aditi</span><span class="disp amt">₹300</span></div>
+            <span class="chip chip--refund">Refund owed</span>
+            <span class="darkbtn">Mark refunded</span>
+          </div>
+          <div class="paper pad-in">
+            <div class="paper__row"><span class="who">Isha</span><span class="disp amt">₹300</span></div>
+            <span class="chip chip--owes">Owes ₹300</span>
+          </div>
+        </section>
+      </div>
     </div>
 
-    <div class="bench">
-      <p class="bench__label">Backups, in Rohan's order</p>
-      <ol class="bench__list">
-        <li class="backup backup--farhan">
-          <span class="backup__name">Farhan</span>
-          <span class="backup__state">
-            <svg class="ring" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle></svg>
-            <span class="st st--wait">Waiting</span>
-            <span class="st st--offer">Spot offered</span>
-            <span class="st st--no">Can't make it</span>
-          </span>
-        </li>
-        <li class="backup backup--isha">
-          <span class="backup__name">Isha</span>
-          <span class="backup__state">
-            <svg class="ring" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle></svg>
-            <span class="st st--wait">Waiting</span>
-            <span class="st st--offer">Spot offered</span>
-            <span class="st st--in">I'm in</span>
-          </span>
-        </li>
-      </ol>
-      <div class="money" aria-hidden="true">
-        <p class="money__line">Aditi's ₹300 share moves to Isha.</p>
-        <p class="money__alert">Rohan sees: refund Aditi ₹300.</p>
+    <div class="side">
+      <div class="scoreboard" aria-hidden="true">
+        <p class="scoreboard__lbl">Rohan's roster</p>
+        <div class="scoreboard__row">
+          <span class="flap flap--m" data-filled>10</span><span class="disp slash">/</span><span class="flap flap--m flap--w">10</span>
+          <span class="disp scoreboard__txt" data-status>FULL</span>
+        </div>
+      </div>
+
+      <div class="behind">
+        <p class="behind__lbl">Behind the screen</p>
+        <ol class="behind__list">
+          <li>Aditi drops out. It's past the cutoff, so she still owes her share unless someone replaces her.</li>
+          <li>The spot is offered to the first backup, Farhan. He has 2 minutes to answer.</li>
+          <li>Farhan declines. The offer moves to the next backup, Isha, with a fresh 2 minutes.</li>
+          <li>Isha accepts. Her screen and everyone else's update at once.</li>
+          <li>Aditi had paid ₹300 and has been replaced, so Rohan is told to refund her. Isha now owes ₹300.</li>
+        </ol>
       </div>
     </div>
   </div>
@@ -60,241 +154,635 @@ const others = ['K', 'M', 'S', 'V', 'P', 'D', 'N', 'J'];
 </div>
 
 <style>
+  /* ---- layout of the stage ---- */
   .chain__stage {
     display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-    gap: 22px;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 28px;
     align-items: start;
+    justify-content: center;
   }
 
-  .game__when,
-  .bench__label {
-    margin: 0 0 10px;
+  .side {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    min-width: 0;
+  }
+
+  .scoreboard {
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: #10231a;
+    border: 2px solid rgb(255 201 77 / 0.45);
+    color: #f4f7f2;
+    align-self: start;
+  }
+
+  .scoreboard__lbl,
+  .behind__lbl {
+    margin: 0 0 8px;
     font-size: var(--step--1);
     color: var(--ink-3);
   }
 
-  .seats {
-    display: grid;
-    grid-template-columns: repeat(5, 40px);
-    gap: 10px;
-    margin: 0 0 12px;
+  .scoreboard__lbl {
+    color: #9ab9a8;
+  }
+
+  .scoreboard__row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .scoreboard__txt {
+    margin-left: 10px;
+    font-size: 24px;
+    letter-spacing: 1px;
+  }
+
+  .behind__list {
+    margin: 0;
     padding: 0;
     list-style: none;
+    counter-reset: b;
   }
 
-  .seat {
+  .behind__list li {
+    position: relative;
+    padding: 0 0 12px 22px;
+    font-size: var(--step--1);
+    line-height: 1.45;
+    color: var(--ink-3);
+    transition: color 200ms ease;
+  }
+
+  .behind__list li::before {
+    content: '';
+    position: absolute;
+    left: 2px;
+    top: 0.45em;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    border: 1.5px solid var(--silk);
+  }
+
+  .chain[data-step='0'] .behind__list li:nth-child(1),
+  .chain[data-step='1'] .behind__list li:nth-child(2),
+  .chain[data-step='2'] .behind__list li:nth-child(3),
+  .chain[data-step='3'] .behind__list li:nth-child(4),
+  .chain[data-step='4'] .behind__list li:nth-child(5) {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .chain[data-step='0'] .behind__list li:nth-child(1)::before,
+  .chain[data-step='1'] .behind__list li:nth-child(2)::before,
+  .chain[data-step='2'] .behind__list li:nth-child(3)::before,
+  .chain[data-step='3'] .behind__list li:nth-child(4)::before,
+  .chain[data-step='4'] .behind__list li:nth-child(5)::before {
+    background: var(--silk);
+  }
+
+  /* ---- the phone ---- */
+  .phone {
+    width: 348px;
+    padding: 9px;
+    border-radius: 36px;
+    background: #0a0d0b;
+    box-shadow: 0 22px 40px -22px rgb(10 12 40 / 0.55);
+  }
+
+  .phone__screen {
+    position: relative;
+    height: 600px;
+    overflow: hidden;
+    border-radius: 28px;
+  }
+
+  /* ---- the app's own look (tokens from BenchCall's theme.dart) ---- */
+  .app {
+    --ink: #f4f7f2;
+    --head: #f3e3bc;
+    --soft: #c2d5ca;
+    --muted: #9ab9a8;
+    --line: rgb(244 247 242 / 0.32);
+    --field: rgb(0 0 0 / 0.22);
+    --lime: #c6f135;
+    --danger: #ff8a73;
+    background: repeating-linear-gradient(180deg, #0b3d28 0 64px, #0d4630 64px 128px);
+    color: var(--ink);
+    font-family: 'Manrope Variable', 'Manrope', system-ui, sans-serif;
+    font-size: 14px;
+  }
+
+  .app .scr {
+    position: absolute;
+    inset: 0;
+    animation: scr-in 380ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+
+  .app .scr[hidden] {
+    display: none;
+  }
+
+  @keyframes scr-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+  }
+
+  .disp {
+    font-family: 'Barlow Condensed', 'Anek Latin Variable', sans-serif;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .demobar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px 8px 12px;
+    background: #06200f;
+  }
+
+  .demobar__tag {
+    padding: 2px 6px;
+    border-radius: 5px;
+    background: var(--lime);
+    color: #10231a;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1px;
+  }
+
+  .demobar__who {
+    flex: 1;
+    font-weight: 700;
+    font-size: 12.5px;
+  }
+
+  .demobar__switch {
+    color: var(--lime);
+    font-weight: 800;
+    font-size: 12.5px;
+  }
+
+  .appbar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px 2px;
+  }
+
+  .appbar__back {
+    width: 28px;
+    font-size: 20px;
+  }
+
+  .appbar__title {
+    font-size: 24px;
+    flex: 1;
+  }
+
+  .live {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 11px;
+    border-radius: 999px;
+    background: var(--field);
+    border: 1px solid var(--line);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 2px;
+  }
+
+  .live i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--lime);
+    animation: pulse 1.8s infinite;
+  }
+
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgb(198 241 53 / 0.8);
+    }
+    70% {
+      box-shadow: 0 0 0 7px rgb(198 241 53 / 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgb(198 241 53 / 0);
+    }
+  }
+
+  .pad {
+    padding: 10px 18px 0;
+  }
+
+  .pad-in {
+    margin: 10px 18px 0;
+  }
+
+  .venue {
+    margin: 0;
+    font-size: 40px;
+    color: var(--head);
+  }
+
+  .where {
+    margin: 6px 0 0;
+    font-size: 13px;
+    color: var(--soft);
+  }
+
+  .lbl {
+    margin: 14px 0 0;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 2.2px;
+    color: var(--muted);
+  }
+
+  .lbl.pad {
+    padding-bottom: 0;
+  }
+
+  .lbl--dark {
+    margin: 0;
+    color: #4a5a51;
+  }
+
+  .rosterbox {
+    margin: 4px 14px 0;
+    padding: 2px 12px 4px;
+    border-radius: 0 0 16px 16px;
+    background: var(--field);
+    border: 2px solid var(--line);
+    border-top: 0;
+  }
+
+  .slot {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 44px;
+    padding: 0 6px;
+  }
+
+  .num {
     display: grid;
     place-items: center;
-    width: 40px;
-    height: 40px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
-    background: var(--ink);
-    color: var(--paper);
-    font-weight: 650;
-    font-size: 14px;
-    transition: background 300ms var(--ease), color 300ms var(--ease), box-shadow 300ms var(--ease);
+    border: 1.5px solid var(--ink);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: 16px;
   }
 
-  .seat--org {
-    box-shadow: 0 0 0 3px var(--paper), 0 0 0 5px var(--zari);
+  .pname {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: 0.3px;
   }
 
-  .game__count {
-    margin: 0;
-    font-size: var(--step--1);
-    color: var(--ink-2);
+  .outline,
+  .cta,
+  .darkbtn,
+  .pill {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 15px;
   }
 
-  .count-short {
-    display: none;
+  .outline {
+    height: 48px;
+    border-radius: 24px;
+    border: 1.5px solid var(--line);
+  }
+
+  .outline--danger {
+    border-color: var(--danger);
     color: var(--danger);
   }
 
-  .bench__list {
-    list-style: none;
-    margin: 0 0 12px;
-    padding: 0;
-    display: grid;
+  .outline--line {
+    color: var(--ink);
+  }
+
+  .cta {
+    height: 50px;
+    border-radius: 25px;
+    background: var(--lime);
+    color: #10231a;
+  }
+
+  .cta--auto {
+    display: inline-flex;
+    align-self: flex-start;
+    padding: 0 26px;
+  }
+
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 16px;
+  }
+
+  .lead {
+    margin: 14px 0 0;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--soft);
+  }
+
+  .textlink {
+    margin-top: 6px;
+    align-self: center;
+    font-weight: 800;
+    color: var(--ink);
+  }
+
+  .youre {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 28px;
+  }
+
+  .stamp {
+    margin: 0;
+    font-size: 40px;
+    color: var(--head);
+    transform: rotate(-2deg);
+    transform-origin: left center;
+    animation: stamp 420ms cubic-bezier(0.3, 1.4, 0.5, 1) both;
+  }
+
+  @keyframes stamp {
+    from {
+      transform: scale(1.5) rotate(-6deg);
+      opacity: 0;
+    }
+  }
+
+  /* cream "paper" cards */
+  .paper {
+    padding: 14px;
+    border-radius: 16px;
+    background: #fbf7ec;
+    color: #10231a;
+    display: flex;
+    flex-direction: column;
     gap: 8px;
   }
 
-  .backup {
+  .paper__row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+
+  .paper__text {
+    margin: 0;
+    font-size: 13.5px;
+    color: #3c4c43;
+  }
+
+  .big {
+    font-size: 40px;
+  }
+
+  .who {
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .amt {
+    font-size: 26px;
+  }
+
+  .chip {
+    align-self: flex-start;
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-size: 11.5px;
+    font-weight: 800;
+  }
+
+  .chip--paid {
+    background: #0e5e3e;
+    color: #fff;
+  }
+
+  .chip--refund,
+  .chip--owes {
+    background: #ffc94d;
+    color: #3a2210;
+  }
+
+  .darkbtn {
+    align-self: flex-start;
+    height: 40px;
+    padding: 0 20px;
+    border-radius: 20px;
+    background: #0f2a1a;
+    color: var(--lime);
+    font-size: 14.5px;
+  }
+
+  .note {
+    margin: 8px 18px 0;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: rgb(255 201 77 / 0.16);
+    border: 1px solid rgb(255 201 77 / 0.4);
+    color: #fbe7b0;
+    font-size: 12.5px;
+    line-height: 1.45;
+  }
+
+  /* dialog */
+  .dim {
+    position: absolute;
+    inset: 0;
+    background: rgb(0 0 0 / 0.55);
+  }
+
+  .dialog {
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    top: 250px;
+    padding: 20px 18px 14px;
+    border-radius: 22px;
+    background: #0a2e1e;
+    box-shadow: 0 30px 60px -20px rgb(0 0 0 / 0.7);
+  }
+
+  .dialog p {
+    margin: 10px 0 0;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--soft);
+  }
+
+  .dialog__h {
+    margin: 0;
+    font-size: 30px;
+    color: var(--head);
+  }
+
+  .dialog__row {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    padding: 10px 12px;
-    border-radius: var(--radius-s);
-    border: 1px solid var(--line);
-    background: var(--paper-2);
-    transition: border-color 240ms, background 240ms;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: 16px;
+    font-weight: 800;
   }
 
-  .backup__name {
-    font-weight: 600;
+  .pill--danger {
+    height: 44px;
+    padding: 0 22px;
+    border-radius: 22px;
+    background: var(--danger);
+    color: #2a0e06;
   }
 
-  .backup__state {
+  /* the countdown clock and split-flap tiles */
+  .flap {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    font-size: var(--step--1);
-    color: var(--ink-3);
+    justify-content: center;
+    width: 40px;
+    height: 48px;
+    border-radius: 6px;
+    background-color: #0a0d0b;
+    background-image: linear-gradient(to bottom, transparent 49%, #000 49%, #000 52%, transparent 52%);
+    color: #ffc94d;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-weight: 700;
+    font-size: 28px;
   }
 
-  .st {
-    display: none;
+  .flap--l {
+    width: 50px;
+    height: 54px;
+    font-size: 30px;
   }
 
-  .st--wait {
-    display: inline;
+  .flap--m {
+    width: 46px;
+    height: 50px;
+    font-size: 26px;
   }
 
-  .ring {
-    width: 20px;
-    height: 20px;
-    display: none;
-    transform: rotate(-90deg);
+  .flap--w {
+    color: #f4f7f2;
   }
 
-  .ring circle {
-    fill: none;
-    stroke: var(--silk);
-    stroke-width: 3;
-    stroke-dasharray: 57;
-    stroke-dashoffset: 0;
+  .slash {
+    font-size: 30px;
+    color: #5e7568;
+    padding: 0 2px;
   }
 
-  .money {
-    padding: 12px;
-    border-radius: var(--radius-s);
-    border: 1px dashed var(--peacock);
-    background: var(--peacock-tint);
-    color: #0a4f4e;
-    opacity: 0;
-    transform: translateY(6px);
-    transition: opacity 300ms var(--ease), transform 300ms var(--ease);
+  .clock {
+    margin: 16px 18px 0;
+    padding: 16px 16px 12px;
+    border-radius: 18px;
+    background: #10231a;
+    border: 2px solid rgb(255 201 77 / 0.45);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    --digit: var(--lime);
   }
 
-  .money p {
-    margin: 0;
-    font-size: var(--step--1);
+  .clock .flap,
+  .clock .colon {
+    color: var(--digit);
   }
 
-  .money__alert {
-    font-weight: 650;
+  .clock__digits {
+    display: flex;
+    align-items: center;
+    gap: 5px;
   }
 
-  /* step 1: Aditi out, Farhan offered */
-  .chain[data-step='1'] .seat--aditi,
-  .chain[data-step='2'] .seat--aditi {
-    background: transparent;
-    color: var(--danger);
-    box-shadow: inset 0 0 0 2px var(--danger);
+  .colon {
+    font-size: 46px;
   }
 
-  .chain[data-step='1'] .count-full,
-  .chain[data-step='2'] .count-full {
-    display: none;
+  .clock__track {
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: rgb(244 247 242 / 0.12);
+    overflow: hidden;
   }
 
-  .chain[data-step='1'] .count-short,
-  .chain[data-step='2'] .count-short {
-    display: inline;
+  .clock__track div {
+    height: 100%;
+    width: 100%;
+    background: var(--digit);
+    transition: width 1s linear, background 300ms;
   }
 
-  .chain[data-step='1'] .backup--farhan,
-  .chain[data-step='2'] .backup--isha {
-    border-color: var(--silk);
-    background: var(--silk-tint);
+  .clock__lbl {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2.4px;
   }
 
-  .chain[data-step='1'] .backup--farhan .ring,
-  .chain[data-step='2'] .backup--isha .ring {
-    display: block;
+  .board {
+    margin: 14px 18px 0;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: #10231a;
+    border: 2px solid rgb(255 201 77 / 0.45);
+    display: flex;
+    align-items: center;
+    gap: 4px;
   }
 
-  .chain[data-step='1'] .backup--farhan .ring circle,
-  .chain[data-step='2'] .backup--isha .ring circle {
-    animation: tick 6s linear forwards;
+  .board__txt {
+    margin-left: 8px;
+    font-size: 17px;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
   }
 
-  @keyframes tick {
-    to {
-      stroke-dashoffset: 57;
-    }
-  }
-
-  .chain[data-step='1'] .backup--farhan .st--wait,
-  .chain[data-step='2'] .backup--isha .st--wait {
-    display: none;
-  }
-
-  .chain[data-step='1'] .backup--farhan .st--offer,
-  .chain[data-step='2'] .backup--isha .st--offer {
-    display: inline;
-    color: var(--silk);
-    font-weight: 600;
-  }
-
-  /* step 2+: Farhan declined */
-  .chain:is([data-step='2'], [data-step='3'], [data-step='4']) .backup--farhan {
-    opacity: 0.55;
-  }
-
-  .chain:is([data-step='2'], [data-step='3'], [data-step='4']) .backup--farhan .st--wait {
-    display: none;
-  }
-
-  .chain:is([data-step='2'], [data-step='3'], [data-step='4']) .backup--farhan .st--no {
-    display: inline;
-    text-decoration: line-through;
-  }
-
-  /* step 3+: Isha in, game full */
-  .chain:is([data-step='3'], [data-step='4']) .seat--aditi {
-    background: var(--silk);
-    color: #fff;
-    font-size: 0;
-  }
-
-  .chain:is([data-step='3'], [data-step='4']) .seat--aditi::after {
-    content: 'I';
-    font-size: 14px;
-  }
-
-  .chain:is([data-step='3'], [data-step='4']) .backup--isha {
-    border-color: var(--peacock);
-  }
-
-  .chain:is([data-step='3'], [data-step='4']) .backup--isha .st--wait {
-    display: none;
-  }
-
-  .chain:is([data-step='3'], [data-step='4']) .backup--isha .st--in {
-    display: inline;
-    color: var(--peacock);
-    font-weight: 650;
-  }
-
-  .chain[data-step='4'] .money {
-    opacity: 1;
-    transform: none;
-  }
-
-  @media (max-width: 680px) {
+  /* below the phone's width: stack */
+  @media (max-width: 760px) {
     .chain__stage {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
+      justify-items: center;
     }
 
-    .seats {
-      grid-template-columns: repeat(5, 36px);
+    .phone {
+      width: min(348px, 100%);
     }
+  }
 
-    .seat {
-      width: 36px;
-      height: 36px;
+  @media (prefers-reduced-motion: reduce) {
+    .app .scr,
+    .stamp,
+    .live i {
+      animation: none;
     }
   }
 </style>
@@ -311,17 +799,65 @@ const others = ['K', 'M', 'S', 'V', 'P', 'D', 'N', 'J'];
     },
   ];
 
+  // What Rohan's scoreboard shows at each step: [filled, label]
+  const board: [string, string][] = [
+    ['10', 'FULL'],
+    ['9', '1 OPEN'],
+    ['9', '1 OPEN'],
+    ['10', 'FULL'],
+    ['10', 'FULL'],
+  ];
+
+  const OFFER_SECONDS = 120;
+
   document.querySelectorAll<HTMLElement>('.chain').forEach((root) => {
     const go = root.querySelector<HTMLButtonElement>('.demo__go')!;
     const text = root.querySelector<HTMLElement>('.demo__text')!;
     const dots = root.querySelectorAll('.demo__dots li');
+    const screens = root.querySelectorAll<HTMLElement>('[data-screen]');
+    const filled = root.querySelector<HTMLElement>('[data-filled]')!;
+    const status = root.querySelector<HTMLElement>('[data-status]')!;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let step = 0;
+    let timer = 0;
+
+    // Draws the countdown on whichever offer screen is showing.
+    const paintClock = (screen: HTMLElement, left: number) => {
+      const clock = screen.querySelector<HTMLElement>('[data-clock]');
+      if (!clock) return;
+      const m = Math.floor(left / 60);
+      const s = left % 60;
+      clock.querySelector('[data-m]')!.textContent = String(m);
+      clock.querySelector('[data-s1]')!.textContent = String(Math.floor(s / 10));
+      clock.querySelector('[data-s2]')!.textContent = String(s % 10);
+      (clock.querySelector('[data-bar]') as HTMLElement).style.width = `${(left / OFFER_SECONDS) * 100}%`;
+      clock.style.setProperty('--digit', left <= 30 ? '#ffc94d' : '#c6f135');
+    };
+
+    const startClock = (screen: HTMLElement) => {
+      let left = OFFER_SECONDS;
+      paintClock(screen, left);
+      if (reduce) return;
+      timer = window.setInterval(() => {
+        left = Math.max(0, left - 1);
+        paintClock(screen, left);
+        if (left === 0) window.clearInterval(timer);
+      }, 1000);
+    };
+
     const render = () => {
+      window.clearInterval(timer);
       root.dataset.step = String(step);
       text.textContent = steps[step].text;
       go.textContent = steps[step].button;
       dots.forEach((d, i) => d.classList.toggle('is-on', i <= step));
+      screens.forEach((s) => (s.hidden = s.dataset.screen !== String(step)));
+      filled.textContent = board[step][0];
+      status.textContent = board[step][1];
+      const showing = root.querySelector<HTMLElement>(`[data-screen="${step}"]`)!;
+      if (step === 1 || step === 2) startClock(showing);
     };
+
     go.addEventListener('click', () => {
       step = (step + 1) % steps.length;
       render();
