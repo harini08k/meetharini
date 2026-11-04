@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.astro/
+.wrangler/
+.env
+.env.*
+# Written by scripts/fetch-videos.mjs on every build
+src/content/scrapbook/yt-*.mdx
