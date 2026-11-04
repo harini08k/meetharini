@@ -1,0 +1,413 @@
+---
+// The scrapbook: every entry in src/content/scrapbook/, newest first, grouped by month.
+// The filter chips and the Wall/List switch are plain buttons wired in the script at the bottom (they only show or hide
+// entries by their `data-tags`). YouTube videos arrive as generated yt-*.mdx files; the hand-written
+// placeholder video card is hidden once real ones exist.
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Thread from '../components/Thread.astro';
+import Entry from '../components/Entry.astro';
+import { site } from '../data/site';
+
+const all = await getCollection('scrapbook');
+const hasFeed = all.some((e) => e.id.startsWith('yt-'));
+const entries = all.filter((e) => !(hasFeed && e.id === '2026-11-youtube')).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const months = new Map<string, typeof entries>();
+for (const e of entries) {
+  const key = e.data.date.toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+  months.set(key, [...(months.get(key) ?? []), e]);
+}
+
+const filters = [
+  ['all', 'All'],
+  ['tech', 'Tech'],
+  ['life', 'Life'],
+  ['travel', 'Travel'],
+  ['runs', 'Runs'],
+  ['videos', 'Videos'],
+  ['thoughts', 'Thoughts'],
+];
+
+const postcards = [
+  { place: 'Seoul', photo: 'Us, under the cherry blossoms', note: 'Dear future me, send a photo of us under the cherry blossoms.' },
+  { place: 'Paris', photo: 'Rowing on the Seine, in autumn', note: "Dear future me, we're rowing on the Seine in autumn. Don't forget." },
+];
+---
+
+<Base
+  theme="night"
+  title="Scrapbook, Harini Karthikeyan"
+  description="The unfiltered part: what Harini is building, where she's been, what she tried for the first time and what she learned."
+>
+  <main id="main" class="page book" data-view="wall">
+    <Thread />
+
+    <header class="sec book__head" data-knot>
+      <div class="book__back">
+        <a class="back" href="/#unravel">Back to business</a>
+      </div>
+      <div class="sec-body sec-body--wide">
+        <h1 class="book__title">Okay. Now the fun part.</h1>
+        <p class="lead book__intro">
+          Hi again. This is the unfiltered part: what I'm building, where I've been, what I tried for the first time and
+          what I learned from it. One page per month, newest first.
+        </p>
+        <p class="book__clock">Off the clock: biriyani, pickleball, romcoms and recipes I've never tried before.</p>
+
+        <div class="tools">
+          <div class="filters" role="group" aria-label="Show entries about">
+            {
+              filters.map(([key, label]) => (
+                <button type="button" class="filter" data-filter={key} aria-pressed={key === 'all' ? 'true' : 'false'}>
+                  {label}
+                </button>
+              ))
+            }
+          </div>
+          <div class="seg seg--night" role="group" aria-label="Layout">
+            <button type="button" data-view="wall" aria-pressed="true">Wall</button>
+            <button type="button" data-view="list" aria-pressed="false">List</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    {
+      [...months.entries()].map(([month, list]) => (
+        <section class="sec month" data-knot aria-label={month}>
+          <h2 class="sec-label">
+            {month}
+            <small class="month__count">
+              {list.length} {list.length === 1 ? 'entry' : 'entries'}
+            </small>
+          </h2>
+          <div class="sec-body sec-body--wide">
+            <div class="wall">
+              {list.map((e) => (
+                <Entry entry={e} />
+              ))}
+            </div>
+            <p class="month__empty" hidden>
+              Quiet month. Probably building something.
+            </p>
+          </div>
+        </section>
+      ))
+    }
+
+    <p class="book__none" hidden>Nothing here yet. Honestly, that's a great idea for a post.</p>
+
+    <section class="sec cards" data-knot data-tags="travel life" aria-labelledby="cards-h">
+      <h2 class="sec-label" id="cards-h">
+        Unsent postcards
+        <small>Postcards to future me. The photo fills in when the trip happens.</small>
+      </h2>
+      <div class="sec-body sec-body--wide">
+        <div class="unsent">
+          {
+            postcards.map((p) => (
+              <article class="unsent__card">
+                <div class="unsent__photo">
+                  <span>{p.photo}</span>
+                </div>
+                <div class="unsent__back">
+                  <span class="unsent__stamp">Not yet</span>
+                  <h3 class="unsent__place">{p.place}</h3>
+                  <p class="unsent__note">{p.note}</p>
+                </div>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <footer class="book__foot">
+      <span data-thread-end></span>
+      <p>
+        Want the work version again? <a href="/">Back to business</a>. Or say hi:{' '}
+        <a class="email-link" href="#" data-u={site.email.split('@')[0]} data-d={site.email.split('@')[1]}>email me</a>.
+      </p>
+    </footer>
+  </main>
+</Base>
+
+<style>
+  .book__head {
+    padding-top: 40px;
+  }
+
+  .book__back {
+    grid-column: 1;
+    padding-left: calc(var(--thread-x) + 30px);
+    padding-top: 10px;
+  }
+
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--chalk);
+    text-decoration: none;
+  }
+
+  .back::before {
+    content: '';
+    width: 14px;
+    height: 14px;
+    border-left: 2px solid var(--silk-night);
+    border-bottom: 2px solid var(--silk-night);
+    transform: rotate(45deg);
+  }
+
+  .back:hover {
+    color: var(--silk-night);
+  }
+
+  .book__title {
+    font-size: var(--step-5);
+    font-weight: 720;
+    font-stretch: 76%;
+    line-height: 0.98;
+    letter-spacing: -0.012em;
+    margin: 0 0 22px;
+    max-width: 12ch;
+  }
+
+  .book__intro {
+    color: var(--chalk);
+  }
+
+  .book__clock {
+    font-family: var(--hand);
+    font-size: var(--step-1);
+    color: var(--silk-night);
+    margin: 0 0 30px;
+  }
+
+  .tools {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .filter {
+    min-height: 38px;
+    padding: 0 16px;
+    border-radius: 999px;
+    border: 1.5px solid var(--rule);
+    background: transparent;
+    color: var(--chalk);
+    font: inherit;
+    font-size: var(--step--1);
+    font-weight: 560;
+    cursor: pointer;
+    transition: all 160ms var(--ease);
+  }
+
+  .filter:hover {
+    border-color: var(--chalk-2);
+  }
+
+  .filter[aria-pressed='true'] {
+    background: var(--silk-night);
+    border-color: var(--silk-night);
+    color: var(--night);
+  }
+
+  .seg--night {
+    background: var(--night-2);
+    border-color: var(--rule);
+  }
+
+  .seg--night button {
+    color: var(--chalk-2);
+  }
+
+  .seg--night button[aria-pressed='true'] {
+    background: var(--chalk);
+    color: var(--night);
+  }
+
+  .month {
+    padding: 56px 0;
+  }
+
+  .month__count {
+    color: var(--chalk-2);
+  }
+
+  .wall {
+    columns: 2 300px;
+    column-gap: 34px;
+  }
+
+  .book[data-view='list'] .wall {
+    columns: auto;
+    border-top: 1px solid var(--rule);
+  }
+
+  .month__empty,
+  .book__none {
+    font-family: var(--hand);
+    font-size: var(--step-1);
+    color: var(--chalk-2);
+  }
+
+  .book__none {
+    grid-column: 2;
+    padding: 40px 0;
+  }
+
+  .unsent {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 28px;
+  }
+
+  .unsent__card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 210px;
+    background: #fbfbfd;
+    color: var(--ink);
+    box-shadow: 0 18px 30px -20px rgba(0, 0, 0, 0.7);
+  }
+
+  .unsent__card:nth-child(odd) {
+    transform: rotate(-1.4deg);
+  }
+
+  .unsent__card:nth-child(even) {
+    transform: rotate(1.2deg);
+  }
+
+  .unsent__photo {
+    display: grid;
+    place-items: center;
+    margin: 12px;
+    padding: 12px;
+    border: 2px dashed #c7cbd8;
+    color: var(--ink-3);
+    font-size: 13px;
+    text-align: center;
+  }
+
+  .unsent__back {
+    position: relative;
+    padding: 16px 16px 14px;
+    border-left: 1px dashed #c7cbd8;
+  }
+
+  .unsent__stamp {
+    position: absolute;
+    top: 12px;
+    right: 10px;
+    padding: 6px 10px;
+    border: 2px solid var(--silk);
+    border-radius: 4px;
+    color: var(--silk);
+    font-weight: 700;
+    font-size: 13px;
+    transform: rotate(8deg);
+  }
+
+  .unsent__place {
+    margin: 36px 0 8px;
+    font-family: var(--hand);
+    font-weight: 700;
+    font-stretch: 100%;
+    font-size: 1.5rem;
+  }
+
+  .unsent__note {
+    margin: 0;
+    font-family: var(--hand);
+    font-size: 1.05rem;
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+
+  .book__foot {
+    grid-column: 2;
+    max-width: 880px;
+    padding: 24px 0 64px;
+    border-top: 1px solid var(--rule);
+    color: var(--chalk-2);
+  }
+
+  .book__foot a {
+    color: var(--chalk);
+    font-weight: 600;
+  }
+
+  @media (max-width: 960px) {
+    .book__back {
+      grid-column: 2;
+      padding: 0 0 22px;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .unsent__card {
+      grid-template-columns: 1fr;
+    }
+
+    .unsent__back {
+      border-left: 0;
+      border-top: 1px dashed #c7cbd8;
+    }
+  }
+</style>
+
+<script>
+  const book = document.querySelector<HTMLElement>('.book')!;
+  const filters = book.querySelectorAll<HTMLButtonElement>('.filter');
+  const none = book.querySelector<HTMLElement>('.book__none')!;
+
+  function apply(tag: string) {
+    let shown = 0;
+    book.querySelectorAll<HTMLElement>('.month').forEach((m) => {
+      let visible = 0;
+      m.querySelectorAll<HTMLElement>('.entry').forEach((e) => {
+        const ok = tag === 'all' || (e.dataset.tags || '').split(' ').includes(tag);
+        e.hidden = !ok;
+        if (ok) visible++;
+      });
+      m.hidden = visible === 0;
+      shown += visible;
+    });
+    const cards = book.querySelector<HTMLElement>('.cards')!;
+    cards.hidden = !(tag === 'all' || (cards.dataset.tags || '').split(' ').includes(tag));
+    none.hidden = shown > 0 || !cards.hidden;
+  }
+
+  filters.forEach((b) =>
+    b.addEventListener('click', () => {
+      filters.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      apply(b.dataset.filter!);
+    })
+  );
+
+  const views = book.querySelectorAll<HTMLButtonElement>('.seg button');
+  views.forEach((b) =>
+    b.addEventListener('click', () => {
+      views.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      book.dataset.view = b.dataset.view;
+    })
+  );
+
+  document.querySelectorAll<HTMLAnchorElement>('a.email-link').forEach((a) => {
+    a.href = `mailto:${a.dataset.u}@${a.dataset.d}`;
+  });
+</script>

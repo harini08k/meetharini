@@ -1,0 +1,511 @@
+---
+// One scrapbook entry. The look depends on `type`:
+//   moment = Polaroid, log = notebook page, video = film strip, travel = postcard, thought = sticky note, post = printed page.
+// Entries are files in src/content/scrapbook/. The tilt is derived from the entry's id, so it stays the same on every build.
+// TODO values in a log's numbers show as "to fill in" until they're replaced.
+import type { CollectionEntry } from 'astro:content';
+import { render } from 'astro:content';
+import Photo from './Photo.astro';
+
+interface Props {
+  entry: CollectionEntry<'scrapbook'>;
+}
+const { entry } = Astro.props;
+const e = entry.data;
+const { Content } = await render(entry);
+
+// Same entry, same tilt, every build.
+const hash = [...entry.id].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
+const tilt = ((hash % 50) / 10 - 2.5).toFixed(2);
+const day = e.date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' });
+const isTodo = (s: string) => s.trim().toUpperCase().startsWith('TODO');
+const photo = e.images[0];
+const typeName = { post: 'Post', moment: 'Moment', log: 'Log', video: 'Video', travel: 'Postcard', thought: 'Thought' }[e.type];
+---
+
+<article
+  class={`entry entry--${e.type}`}
+  data-tags={e.tags.join(' ')}
+  style={`--tilt:${tilt}deg`}
+  aria-labelledby={`e-${entry.id}`}
+>
+  <p class="entry__meta">
+    <span class="entry__type">{typeName}</span>
+    <time datetime={e.date.toISOString()}>{day}</time>
+  </p>
+
+  {
+    e.type === 'moment' && (
+      <div class="polaroid">
+        <span class="tape" aria-hidden="true" />
+        {photo && <Photo id={photo.id} src={photo.src} alt={photo.alt} />}
+        <h3 class="hand-title" id={`e-${entry.id}`}>{e.title}</h3>
+        {e.caption && <p class="hand">{e.caption}</p>}
+        {e.place && <p class="small">{e.place}</p>}
+        {e.link && <a class="entry__link" href={e.link}>{e.linkLabel ?? 'More'}</a>}
+      </div>
+    )
+  }
+
+  {
+    e.type === 'log' && (
+      <div class="notebook">
+        <h3 class="nb-title" id={`e-${entry.id}`}>{e.title}</h3>
+        {e.caption && <p class="nb-text">{e.caption}</p>}
+        {e.stats && (
+          <dl class="nb-stats">
+            {e.stats.map((s) => (
+              <div>
+                <dt>{s.label}</dt>
+                <dd class={isTodo(s.value) ? 'todo' : ''}>{isTodo(s.value) ? 'to fill in' : s.value}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
+        {e.findings && (
+          <>
+            <p class="nb-label">What I found</p>
+            <ul class="nb-found">
+              {e.findings.map((f) => (
+                <li class={isTodo(f) ? 'todo' : ''}>{isTodo(f) ? 'to fill in' : f}</li>
+              ))}
+            </ul>
+          </>
+        )}
+        {photo && !photo.src && (
+          <p class="small">
+            {photo.id}: {photo.alt.toLowerCase()}, no route map
+          </p>
+        )}
+      </div>
+    )
+  }
+
+  {
+    e.type === 'video' && (
+      <div class="film">
+        {e.thumb ? (
+          <a class="film__thumb" href={e.link} aria-label={`Watch ${e.title} on YouTube`}>
+            <img src={e.thumb} alt="" loading="lazy" width="480" height="360" />
+            <span class="film__play" aria-hidden="true" />
+          </a>
+        ) : (
+          <span class="film__play" aria-hidden="true" />
+        )}
+        <h3 class="film__title" id={`e-${entry.id}`}>{e.title}</h3>
+        {e.caption && <p class="film__text">{e.caption}</p>}
+        {e.link && <a class="entry__link" href={e.link}>{e.linkLabel ?? 'Watch'}</a>}
+      </div>
+    )
+  }
+
+  {
+    e.type === 'travel' && (
+      <div class="postcard">
+        <div class="postcard__photo">
+          {photo && <Photo id={photo.id} src={photo.src} alt={photo.alt} />}
+        </div>
+        <div class="postcard__back">
+          <span class="stamp-box" aria-hidden="true" />
+          <h3 class="hand-title" id={`e-${entry.id}`}>{e.title}</h3>
+          {e.caption && <p class="hand">{e.caption}</p>}
+          {e.place && <p class="postmark">{e.place}</p>}
+        </div>
+      </div>
+    )
+  }
+
+  {
+    e.type === 'thought' && (
+      <div class="sticky">
+        <span class="tape" aria-hidden="true" />
+        <h3 class="visually-hidden" id={`e-${entry.id}`}>{e.title}</h3>
+        <p class="sticky__text">{e.caption}</p>
+      </div>
+    )
+  }
+
+  {
+    e.type === 'post' && (
+      <div class="page-card">
+        <h3 class="nb-title" id={`e-${entry.id}`}>{e.title}</h3>
+        {e.caption && <p class="nb-text">{e.caption}</p>}
+        <div class="page-card__body">
+          <Content />
+        </div>
+      </div>
+    )
+  }
+
+  <div class="entry__row">
+    <span class="row__title">{e.title}</span>
+    {e.caption && <span class="row__cap">{e.caption}</span>}
+  </div>
+</article>
+
+<style>
+  .entry {
+    break-inside: avoid;
+    margin: 0 0 30px;
+    color: var(--ink);
+    container-type: inline-size;
+  }
+
+  .entry__meta {
+    display: flex;
+    gap: 10px;
+    margin: 0 0 8px;
+    font-size: 13px;
+    color: var(--chalk-2);
+  }
+
+  .entry__type {
+    font-weight: 600;
+    color: var(--silk-night);
+  }
+
+  .entry__row {
+    display: none;
+  }
+
+  .tape {
+    position: absolute;
+    top: -11px;
+    left: 50%;
+    width: 84px;
+    height: 22px;
+    transform: translateX(-50%) rotate(-4deg);
+    background: color-mix(in srgb, var(--zari) 60%, transparent);
+  }
+
+  .hand-title {
+    font-family: var(--hand);
+    font-weight: 700;
+    font-stretch: 100%;
+    font-size: 1.3rem;
+    line-height: 1.2;
+    margin: 12px 0 4px;
+    color: var(--ink);
+  }
+
+  .hand {
+    font-family: var(--hand);
+    font-size: 1.05rem;
+    line-height: 1.45;
+    margin: 0 0 6px;
+    color: var(--ink-2);
+  }
+
+  .small {
+    font-size: 13px;
+    color: var(--ink-3);
+    margin: 4px 0 0;
+  }
+
+  .entry__link {
+    display: inline-block;
+    margin-top: 8px;
+    font-weight: 600;
+    font-size: var(--step--1);
+    color: var(--silk);
+  }
+
+  /* moment: a polaroid */
+  .polaroid {
+    position: relative;
+    padding: 12px 12px 18px;
+    background: #fbfbfd;
+    transform: rotate(var(--tilt));
+    box-shadow: 0 18px 30px -20px rgba(0, 0, 0, 0.7);
+    transition: transform 260ms var(--ease);
+  }
+
+  .polaroid:hover {
+    transform: rotate(0deg) translateY(-3px);
+  }
+
+  .polaroid img,
+  .polaroid .ph {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  /* log: a notebook page */
+  .notebook {
+    position: relative;
+    padding: 20px 20px 18px 40px;
+    border-radius: 3px;
+    background:
+      linear-gradient(90deg, transparent 27px, color-mix(in srgb, var(--silk) 55%, transparent) 27px 29px, transparent 29px),
+      repeating-linear-gradient(0deg, transparent 0 25px, #d3dbef 25px 26px),
+      #eef2fb;
+    transform: rotate(calc(var(--tilt) / 2));
+    box-shadow: 0 18px 30px -20px rgba(0, 0, 0, 0.7);
+  }
+
+  .nb-title {
+    font-size: var(--step-2);
+    font-stretch: 82%;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+
+  .nb-text {
+    color: var(--ink-2);
+    margin-bottom: 12px;
+  }
+
+  .nb-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 12px;
+  }
+
+  .nb-stats div {
+    padding: 6px 10px;
+    border: 1.5px solid var(--ink);
+    border-radius: 4px;
+    background: #fff;
+  }
+
+  .nb-stats dt {
+    font-size: 12px;
+    color: var(--ink-3);
+  }
+
+  .nb-stats dd {
+    margin: 0;
+    font-weight: 700;
+    font-stretch: 85%;
+    font-size: var(--step-1);
+  }
+
+  .nb-stats dd.todo {
+    font-size: var(--step--1);
+    font-weight: 500;
+  }
+
+  .nb-label {
+    font-weight: 600;
+    margin: 0 0 4px;
+  }
+
+  .nb-found {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-family: var(--hand);
+    font-size: 1.05rem;
+  }
+
+  .nb-found li::before {
+    content: '';
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-right: 8px;
+    border: 1.5px solid var(--ink);
+    border-radius: 2px;
+    vertical-align: -1px;
+  }
+
+  .nb-found li.todo {
+    border: 0;
+    color: var(--ink-3);
+  }
+
+  /* video: a film strip */
+  .film__thumb {
+    position: relative;
+    display: block;
+    margin-bottom: 12px;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .film__thumb img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  .film__thumb .film__play {
+    position: absolute;
+    inset: 50% auto auto 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .film {
+    position: relative;
+    padding: 30px 20px;
+    border-radius: 4px;
+    background:
+      radial-gradient(circle, var(--night) 3.5px, transparent 4px) 0 7px / 18px 100% repeat-x,
+      radial-gradient(circle, var(--night) 3.5px, transparent 4px) 0 calc(100% - 7px) / 18px 100% repeat-x,
+      #0f1230;
+    background-size: 18px 18px, 18px 18px, auto;
+    background-position: 0 0, 0 100%, 0 0;
+    color: var(--chalk);
+  }
+
+  .film__play {
+    display: grid;
+    place-items: center;
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: var(--silk-night);
+    margin-bottom: 14px;
+  }
+
+  .film__play::after {
+    content: '';
+    margin-left: 4px;
+    border-style: solid;
+    border-width: 10px 0 10px 16px;
+    border-color: transparent transparent transparent var(--night);
+  }
+
+  .film__title {
+    font-size: var(--step-2);
+    font-stretch: 82%;
+    color: var(--chalk);
+    margin-bottom: 6px;
+  }
+
+  .film__text {
+    color: var(--chalk-2);
+    margin-bottom: 4px;
+  }
+
+  .film .entry__link {
+    color: var(--silk-night);
+  }
+
+  /* travel: a postcard */
+  .postcard {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: #fbfbfd;
+    transform: rotate(var(--tilt));
+    box-shadow: 0 18px 30px -20px rgba(0, 0, 0, 0.7);
+  }
+
+  .postcard__photo .ph,
+  .postcard__photo img {
+    width: 100%;
+    height: 100%;
+    min-height: 220px;
+    aspect-ratio: auto;
+    object-fit: cover;
+  }
+
+  @container (max-width: 520px) {
+    .postcard {
+      grid-template-columns: 1fr;
+    }
+
+    .postcard__photo .ph,
+    .postcard__photo img {
+      min-height: 0;
+      aspect-ratio: 3 / 2;
+    }
+
+    .postcard__back {
+      border-left: 0;
+      border-top: 1px dashed #c7cbd8;
+    }
+  }
+
+  .postcard__back {
+    position: relative;
+    padding: 16px 16px 14px;
+    border-left: 1px dashed #c7cbd8;
+    background: repeating-linear-gradient(0deg, transparent 0 31px, #e3e6ee 31px 32px);
+  }
+
+  .stamp-box {
+    float: right;
+    width: 46px;
+    height: 56px;
+    margin: 0 0 6px 8px;
+    border: 2px dashed var(--zari);
+    background:
+      radial-gradient(circle at 50% 50%, var(--silk) 2px, transparent 2.5px) 0 0 / 11px 11px,
+      #fff;
+  }
+
+  .postmark {
+    clear: both;
+    display: inline-block;
+    margin: 6px 0 0;
+    padding: 4px 10px;
+    border: 1.5px solid var(--ink-3);
+    border-radius: 999px;
+    font-size: 12px;
+    color: var(--ink-3);
+    transform: rotate(-6deg);
+  }
+
+  /* thought: a sticky note */
+  .sticky {
+    position: relative;
+    padding: 30px 22px 26px;
+    background: #f9d3e3;
+    transform: rotate(var(--tilt));
+    box-shadow: 0 18px 30px -20px rgba(0, 0, 0, 0.7);
+  }
+
+  .sticky__text {
+    margin: 0;
+    font-family: var(--hand);
+    font-size: 1.3rem;
+    line-height: 1.4;
+    color: #4a1530;
+  }
+
+  .page-card {
+    padding: 22px;
+    background: #fbfbfd;
+    border-radius: 3px;
+  }
+
+  /* list view */
+  :global(.book[data-view='list']) .entry {
+    display: grid;
+    grid-template-columns: 120px minmax(0, 1fr);
+    gap: 16px;
+    margin: 0;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--rule);
+    color: var(--chalk);
+  }
+
+  :global(.book[data-view='list']) .entry > div:not(.entry__row) {
+    display: none;
+  }
+
+  :global(.book[data-view='list']) .entry__meta {
+    flex-direction: column;
+    gap: 0;
+    margin: 0;
+  }
+
+  :global(.book[data-view='list']) .entry__row {
+    display: grid;
+    gap: 2px;
+  }
+
+  .row__title {
+    font-weight: 650;
+    font-size: var(--step-1);
+    font-stretch: 86%;
+  }
+
+  .row__cap {
+    color: var(--chalk-2);
+  }
+</style>
