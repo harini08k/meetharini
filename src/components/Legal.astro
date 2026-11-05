@@ -42,19 +42,24 @@ const year = new Date().getFullYear();
     margin: 0;
   }
 
+  /* Same size as the copyright line; the pink underline only appears on hover or keyboard focus. */
   .legal__btn {
     padding: 0;
     border: 0;
     background: none;
     color: inherit;
     font: inherit;
-    text-decoration: underline;
+    font-size: inherit;
+    text-decoration: none;
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 1.5px;
     text-underline-offset: 3px;
     cursor: pointer;
   }
 
-  .legal__btn:hover {
-    color: var(--fg);
+  .legal__btn:hover,
+  .legal__btn:focus-visible {
+    text-decoration-line: underline;
   }
 
   .cookie {
