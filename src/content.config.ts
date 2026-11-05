@@ -18,6 +18,8 @@ const scrapbook = defineCollection({
     tags: z.array(z.enum(['tech', 'life', 'travel', 'runs', 'videos', 'thoughts'])).default([]),
     caption: z.string().optional(),
     place: z.string().optional(),
+    // Set to false when only the month is known: the card then shows "Dec 2025" instead of a day.
+    showDay: z.boolean().default(true),
     // Leave src empty to show a placeholder frame until the photo is uploaded.
     images: z
       .array(z.object({ src: image().optional(), alt: z.string(), id: z.string().optional() }))

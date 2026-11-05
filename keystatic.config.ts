@@ -45,6 +45,7 @@ export default config({
         }),
         caption: fields.text({ label: 'One-line hook or caption', multiline: true }),
         place: fields.text({ label: 'Place (optional)' }),
+        showDay: fields.checkbox({ label: 'Show the day on the card', description: 'Untick if you only know the month.', defaultValue: true }),
         images: fields.array(
           fields.object({
             src: fields.image({

@@ -13,4 +13,3 @@ Things only Harini can supply. Each one is also marked on the site as a placehol
 - [ ] New recipe: which dish
 - [ ] New York: best thing about it, and the month of the trip
 - [ ] Hero photo: say if you want one at all (the hero has no slot yet)
-- [ ] Exact days for the two Snowflake meetups (src/content/scrapbook/2025-12-boston-snowflake.mdx and 2026-07-chennai-snowflake.mdx). Both are set to the 1st of the month for now, and the card shows that day.
