@@ -116,7 +116,14 @@ import Emph from './Emph.astro';
     animation: proof-in 260ms var(--ease);
   }
 
+  /* several lines in one proof sit together, with no blank gap between them */
+  .receipt__proof p {
+    margin: 0;
+  }
+
   .receipt__proof a {
+    display: inline-block;
+    margin-top: 14px;
     font-weight: 560;
     color: var(--fg);
   }
