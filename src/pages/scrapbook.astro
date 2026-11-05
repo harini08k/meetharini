@@ -7,6 +7,7 @@ import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import Thread from '../components/Thread.astro';
 import Entry from '../components/Entry.astro';
+import Legal from '../components/Legal.astro';
 import { site } from '../data/site';
 
 const all = await getCollection('scrapbook');
@@ -129,6 +130,7 @@ const postcards = [
         Want the work version again? <a href="/">Back to business</a>. Or say hi:{' '}
         <a class="email-link" href="#" data-u={site.email.split('@')[0]} data-d={site.email.split('@')[1]}>email me</a>.
       </p>
+      <Legal />
     </footer>
   </main>
 </Base>
@@ -344,6 +346,10 @@ const postcards = [
     padding: 24px 0 64px;
     border-top: 1px solid var(--rule);
     color: var(--chalk-2);
+  }
+
+  .book__foot p:first-of-type {
+    margin-bottom: 18px;
   }
 
   .book__foot a {

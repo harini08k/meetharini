@@ -1,0 +1,126 @@
+---
+// The small print at the bottom of every page: copyright line, a "Cookie preferences" button and the dialog it opens.
+// The site has no analytics or ad cookies. The only thing it can save is the Recruiter mode choice (in localStorage),
+// so the one preference here is whether to remember that on this device. Nav.astro reads the same "remember" flag.
+const year = new Date().getFullYear();
+---
+
+<div class="legal">
+  <p class="legal__line">&copy; {year} Harini Karthikeyan. All rights reserved.</p>
+  <button type="button" class="legal__btn" data-cookie-open>Cookie preferences</button>
+</div>
+
+<dialog class="cookie" aria-labelledby="cookie-h" data-cookie-dialog>
+  <form method="dialog" class="cookie__box">
+    <h2 class="cookie__h" id="cookie-h">Cookie preferences</h2>
+    <p>
+      This site doesn't use advertising or tracking cookies, and it doesn't run analytics. The only thing it can save on
+      your device is your Recruiter mode choice, and that stays in your browser. It's never sent anywhere.
+    </p>
+    <label class="cookie__row">
+      <input type="checkbox" data-cookie-remember checked />
+      <span>Remember my Recruiter mode choice on this device</span>
+    </label>
+    <div class="cookie__actions">
+      <button class="btn btn--primary" value="done">Done</button>
+    </div>
+  </form>
+</dialog>
+
+<style>
+  .legal {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px 24px;
+    font-size: var(--step--1);
+    color: var(--fg-2);
+  }
+
+  .legal__line {
+    margin: 0;
+  }
+
+  .legal__btn {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+
+  .legal__btn:hover {
+    color: var(--fg);
+  }
+
+  .cookie {
+    width: min(92vw, 460px);
+    padding: 0;
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-m);
+    background: var(--surface);
+    color: var(--fg);
+  }
+
+  .cookie::backdrop {
+    background: rgb(20 22 50 / 0.55);
+  }
+
+  .cookie__box {
+    padding: 24px;
+  }
+
+  .cookie__h {
+    margin: 0 0 10px;
+    font-size: var(--step-1);
+    font-stretch: 84%;
+  }
+
+  .cookie__box p {
+    margin: 0 0 16px;
+    font-size: var(--step--1);
+    color: var(--fg-2);
+  }
+
+  .cookie__row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    font-size: var(--step--1);
+    cursor: pointer;
+  }
+
+  .cookie__row input {
+    margin-top: 3px;
+    accent-color: var(--accent);
+  }
+
+  .cookie__actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+  }
+</style>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>('[data-cookie-dialog]');
+  const box = document.querySelector<HTMLInputElement>('[data-cookie-remember]');
+  try {
+    if (box) box.checked = localStorage.getItem('remember') !== '0';
+  } catch {}
+  document.querySelector('[data-cookie-open]')?.addEventListener('click', () => dialog?.showModal());
+  // Click on the dim area closes it.
+  dialog?.addEventListener('click', (e) => {
+    if (e.target === dialog) dialog.close();
+  });
+  box?.addEventListener('change', () => {
+    try {
+      localStorage.setItem('remember', box.checked ? '1' : '0');
+      if (!box.checked) localStorage.removeItem('recruiter');
+    } catch {}
+  });
+</script>

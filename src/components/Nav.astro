@@ -364,11 +364,12 @@ const links = [
       document.querySelectorAll('.file__btn[aria-expanded="false"]').forEach((b) => (b as HTMLElement).click());
     }
     try {
-      localStorage.setItem('recruiter', on ? '1' : '0');
+      // The cookie-preferences dialog can switch remembering off.
+      if (localStorage.getItem('remember') !== '0') localStorage.setItem('recruiter', on ? '1' : '0');
     } catch {}
   }
   btn?.addEventListener('click', () => setRecruiter(btn.getAttribute('aria-pressed') !== 'true'));
   try {
-    if (localStorage.getItem('recruiter') === '1') setRecruiter(true);
+    if (localStorage.getItem('remember') !== '0' && localStorage.getItem('recruiter') === '1') setRecruiter(true);
   } catch {}
 </script>

@@ -1,8 +1,8 @@
 ---
-// Footer: the email line and the build date. The date is when the site was last built, so the daily rebuild keeps it fresh.
+// Footer: the email line, then the copyright and cookie-preferences row (Legal.astro).
 // The email address is split so it isn't sitting in the page as one plain string.
+import Legal from './Legal.astro';
 import { site } from '../data/site';
-const built = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 const [u, d] = site.email.split('@');
 ---
 
@@ -11,11 +11,7 @@ const [u, d] = site.email.split('@');
     Still scrolling? We should probably talk.{' '}
     <a class="email-link" href="#" data-u={u} data-d={d}>Email me</a>
   </p>
-  <p class="foot__meta">
-    <span>Built by me with Astro.</span>
-    <span>Last deployed {built}.</span>
-    <a href={site.links.repo}>Source on GitHub</a>
-  </p>
+  <Legal />
 </footer>
 
 <style>
@@ -28,21 +24,13 @@ const [u, d] = site.email.split('@');
 
   .foot__talk {
     font-size: var(--step-1);
-    margin-bottom: 10px;
+    margin-bottom: 18px;
   }
 
   .foot__talk a {
     font-weight: 600;
   }
 
-  .foot__meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px 14px;
-    margin: 0;
-    font-size: var(--step--1);
-    color: var(--fg-2);
-  }
 </style>
 
 <script>
