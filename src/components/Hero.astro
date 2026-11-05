@@ -1,7 +1,6 @@
 ---
 import { existsSync } from 'node:fs';
 import { site } from '../data/site';
-import Photo from './Photo.astro';
 
 // The kolam: one unbroken line weaving through a grid of dots,
 // then dropping into the rail as the thread that runs down the whole site.
@@ -53,13 +52,6 @@ const hasResume = existsSync(new URL('../../public/resume.pdf', import.meta.url)
   </div>
 
   <div class="sec-body hero__body">
-    <div class="hero__text">
-    <aside class="nudge" aria-label="For recruiters">
-      <span class="nudge__dot" aria-hidden="true"></span>
-      <p class="nudge__text">Recruiter? Skip the scroll.</p>
-      <button class="nudge__btn" type="button" data-recruiter-trigger>Show me the 30-second version</button>
-    </aside>
-
     <div class="hero__hello">
       <span class="avatar" aria-hidden="true">HK</span>
       <p>Hi, I'm Harini Karthikeyan.</p>
@@ -91,13 +83,7 @@ const hasResume = existsSync(new URL('../../public/resume.pdf', import.meta.url)
     </div>
     <p class="say-hi__note" aria-live="polite"></p>
 
-
     <p class="hero__hint">Scroll for the work. Pull the thread at the bottom for the rest of me.</p>
-    </div>
-
-    <figure class="hero__photo">
-      <Photo id="IMG-01" alt="Harini" loading="eager" sizes="(min-width: 960px) 320px, 70vw" />
-    </figure>
   </div>
 </header>
 
@@ -148,98 +134,7 @@ const hasResume = existsSync(new URL('../../public/resume.pdf', import.meta.url)
   }
 
   .hero__body {
-    max-width: 1080px;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 300px;
-    gap: 56px;
-    align-items: center;
-  }
-
-  .hero__photo {
-    margin: 0;
-    padding: 10px;
-    border: 1.5px solid var(--ink);
-    border-radius: 18px;
-    background: var(--surface, #fff);
-    box-shadow: 10px 10px 0 var(--silk-tint);
-    transform: rotate(1.5deg);
-  }
-
-  .hero__photo :global(img),
-  .hero__photo :global(.ph) {
-    display: block;
-    width: 100%;
-    height: auto;
-    aspect-ratio: 4 / 5;
-    object-fit: cover;
-    border-radius: 10px;
-  }
-
-  .nudge {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin: 0 0 22px;
-    padding: 6px 6px 6px 14px;
-    border: 1.5px dashed var(--silk);
-    border-radius: 999px;
-    background: var(--silk-tint);
-  }
-
-  .nudge__dot {
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    background: var(--silk);
-    animation: pulse-silk 2.4s ease-out infinite;
-  }
-
-  @keyframes pulse-silk {
-    0% {
-      box-shadow: 0 0 0 0 color-mix(in srgb, var(--silk) 45%, transparent);
-    }
-    70%,
-    100% {
-      box-shadow: 0 0 0 9px transparent;
-    }
-  }
-
-  .nudge__text {
-    margin: 0;
-    font-size: var(--step--1);
-    font-weight: 600;
-  }
-
-  .nudge__btn {
-    min-height: 34px;
-    padding: 0 16px;
-    border: 0;
-    border-radius: 999px;
-    background: var(--silk);
-    color: #fff;
-    font: inherit;
-    font-size: var(--step--1);
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 160ms var(--ease), transform 160ms var(--ease);
-  }
-
-  .nudge__btn:hover {
-    background: var(--ink);
-  }
-
-  .nudge__btn:active {
-    transform: scale(0.97);
-  }
-
-  .nudge__btn:focus-visible {
-    outline: 2px solid var(--ink);
-    outline-offset: 2px;
-  }
-
-  :global(html[data-recruiter]) .hero {
-    display: none;
+    max-width: 820px;
   }
 
   .hero__hello {
@@ -382,12 +277,6 @@ const hasResume = existsSync(new URL('../../public/resume.pdf', import.meta.url)
 
     .hero__body {
       grid-column: 2;
-      grid-template-columns: minmax(0, 1fr);
-      gap: 36px;
-    }
-
-    .hero__photo {
-      max-width: 260px;
     }
   }
 </style>
