@@ -405,6 +405,14 @@ const postcards = [
     })
   );
 
+  // Links like /scrapbook/#tech open with that tab already selected.
+  const fromHash = () => {
+    const wanted = [...filters].find((b) => b.dataset.filter === location.hash.slice(1));
+    if (wanted) wanted.click();
+  };
+  fromHash();
+  window.addEventListener('hashchange', fromHash);
+
   const views = book.querySelectorAll<HTMLButtonElement>('.seg button');
   views.forEach((b) =>
     b.addEventListener('click', () => {

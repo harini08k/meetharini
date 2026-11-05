@@ -38,8 +38,8 @@ export const receipts = [
   {
     claim: 'I show up.',
     proof:
-      "Snowflake User Group Chennai, FlutterCon Bangalore, tech conferences, and two certifications I took because I was curious: AWS Certified AI Practitioner and Google's Vertex AI.",
-    link: { label: 'The short version', href: '#about' },
+      'Boston Snowflake User Group, Snowflake User Group Chennai, FlutterCon Bangalore, tech conferences, and the **AWS Certified AI Practitioner (AIF-C01)** certification, which I earned in October 2025 just because I was curious.',
+    link: { label: 'See them in the scrapbook', href: '/scrapbook/#tech' },
   },
 ];
 
@@ -140,7 +140,7 @@ export const quickFacts = [
   'Based in Chennai',
   'Bachelor of Engineering in Computer Science at Sri Venkateswara College of Engineering (Anna University), class of 2028',
   'CGPA 8.23',
-  'AWS Certified AI Practitioner (Oct 2025)',
+  '**AWS Certified AI Practitioner (AIF-C01)**, Oct 2025',
   'Google Vertex AI certification (Oct 2025)',
   'Member, Snowflake User Group Chennai',
 ];

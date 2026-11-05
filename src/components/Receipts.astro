@@ -2,6 +2,7 @@
 // Receipts: each claim is a native <details>; opening it shows the proof and a link.
 // Content is `receipts` in src/data/resume.ts. No JavaScript needed.
 import { receipts } from '../data/resume';
+import Emph from './Emph.astro';
 ---
 
 <section class="sec" id="receipts" data-knot aria-labelledby="receipts-h">
@@ -20,7 +21,7 @@ import { receipts } from '../data/resume';
                 <span class="receipt__toggle" aria-hidden="true" />
               </summary>
               <div class="receipt__proof">
-                <p>{r.proof}</p>
+                <p><Emph text={r.proof} /></p>
                 <a href={r.link.href}>{r.link.label}</a>
               </div>
             </details>

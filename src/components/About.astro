@@ -2,6 +2,7 @@
 // The last résumé section: one paragraph, the quick facts list and the "Off the clock" sticky note.
 // Words come from quickFacts and offTheClock in src/data/resume.ts.
 import { quickFacts, offTheClock } from '../data/resume';
+import Emph from './Emph.astro';
 import { site } from '../data/site';
 ---
 
@@ -16,7 +17,7 @@ import { site } from '../data/site';
           anyone else can.
         </p>
         <ul class="facts">
-          {quickFacts.map((f) => <li>{f}</li>)}
+          {quickFacts.map((f) => <li><Emph text={f} /></li>)}
           <li>
             YouTube: <a href={site.links.youtube}>@harini08k</a>. Mostly tech: my projects, demos, building things from
             scratch and what it's actually like to use a tool. Now and then, something non-tech I'm passionate about.

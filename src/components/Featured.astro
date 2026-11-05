@@ -16,8 +16,8 @@ interface Props {
   stats: string[];
   actions: Action[];
   note?: string;
-  image: string;
-  imageAlt: string;
+  image?: string;
+  imageAlt?: string;
 }
 const { id, name, badges, tagline, line, stats, actions, note, image, imageAlt } = Astro.props;
 ---
@@ -36,7 +36,7 @@ const { id, name, badges, tagline, line, stats, actions, note, image, imageAlt }
       )
     }
     <p class="feat__tagline">{tagline}</p>
-    <div class="feat__grid">
+    <div class={`feat__grid ${image ? '' : 'feat__grid--solo'}`}>
       <div>
         <p class="lead">{line}</p>
         <ul class="feat__stats">
@@ -47,9 +47,13 @@ const { id, name, badges, tagline, line, stats, actions, note, image, imageAlt }
         </div>
         {note && <p class="feat__note">{note}</p>}
       </div>
-      <figure class="feat__shot">
-        <Photo id={image} alt={imageAlt} />
-      </figure>
+      {
+        image && (
+          <figure class="feat__shot">
+            <Photo id={image} alt={imageAlt ?? ''} />
+          </figure>
+        )
+      }
     </div>
     {
       Astro.slots.has('default') && (
@@ -90,6 +94,10 @@ const { id, name, badges, tagline, line, stats, actions, note, image, imageAlt }
     gap: 28px;
     align-items: start;
     margin-bottom: 32px;
+  }
+
+  .feat__grid--solo {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .feat__stats {
