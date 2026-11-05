@@ -24,9 +24,13 @@ const { title, description, name, tagline, badges, links } = Astro.props;
         <a class="back" href="/">All of Harini's work</a>
       </div>
       <div class="sec-body sec-body--wide">
-        <ul class="chip-row case__badges">
-          {badges.map((b, i) => <li class={`chip ${i === 0 ? 'chip--award' : ''}`}>{b}</li>)}
-        </ul>
+        {
+          badges.length > 0 && (
+            <ul class="chip-row case__badges">
+              {badges.map((b, i) => <li class={`chip ${i === 0 ? 'chip--award' : ''}`}>{b}</li>)}
+            </ul>
+          )
+        }
         <h1 class="case__name">{name}</h1>
         <p class="case__tagline">{tagline}</p>
         <div class="btn-row">

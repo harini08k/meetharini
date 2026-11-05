@@ -10,9 +10,9 @@ import HourlyLimit from '../../components/demos/HourlyLimit.astro';
   description="How Harini built an email scheduler that sends exactly once, on time, even through crashes, with per-sender hourly limits."
   name="ReachInbox Scheduler"
   tagline="It sends your email at 3:00. Exactly once. Even if the server crashes at 2:59."
-  badges={['Hiring assignment', 'ReachInbox SDE intern']}
+  badges={[]}
   links={[
-    { label: 'Try the live demo', href: 'https://reachinbox-kohl-alpha.vercel.app' },
+    { label: 'Watch the demo', href: 'https://youtu.be/bnRbRThotFc' },
     { label: 'Code on GitHub', href: 'https://github.com/harini08k/reachinbox' },
     { label: 'Architecture', href: 'https://github.com/harini08k/reachinbox/blob/main/ARCHITECTURE.md' },
     { label: 'Trade-offs', href: 'https://github.com/harini08k/reachinbox/blob/main/TRADEOFFS.md' },
@@ -25,7 +25,6 @@ import HourlyLimit from '../../components/demos/HourlyLimit.astro';
         Build a production-grade email scheduler and dashboard: send emails in the future, enforce per-sender rate
         limits, survive restarts without losing or duplicating anything, and stay honest about what's simplified.
       </p>
-      <p class="muted">Free hosting naps when nobody's around. The first click on the live demo can take 30 to 60 seconds.</p>
     </div>
   </section>
 
@@ -56,7 +55,7 @@ import HourlyLimit from '../../components/demos/HourlyLimit.astro';
   </section>
 
   <section class="sec" data-knot>
-    <h2 class="sec-label">Try it</h2>
+    <h2 class="sec-label">Try the simulation</h2>
     <div class="sec-body sec-body--wide" style="display:grid;gap:22px">
       <CrashWorker />
       <HourlyLimit />

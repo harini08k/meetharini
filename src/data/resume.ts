@@ -36,12 +36,6 @@ export const receipts = [
     },
   },
   {
-    claim: "I'm honest about what's mine.",
-    proof:
-      'BenchCall\'s README has a section called "AI use" that says exactly what Claude Code did and what I did. Short version: the vibes were AI-assisted, the decisions were mine.',
-    link: { label: 'BenchCall README', href: 'https://github.com/harini08k/benchcall' },
-  },
-  {
     claim: 'I show up.',
     proof:
       "Snowflake User Group Chennai, FlutterCon Bangalore, tech conferences, and two certifications I took because I was curious: AWS Certified AI Practitioner and Google's Vertex AI.",
@@ -144,7 +138,7 @@ export const timeline = [
 
 export const quickFacts = [
   'Based in Chennai',
-  'CSE at Sri Venkateswara College of Engineering (Anna University), class of 2028',
+  'Bachelor of Engineering in Computer Science at Sri Venkateswara College of Engineering (Anna University), class of 2028',
   'CGPA 8.23',
   'AWS Certified AI Practitioner (Oct 2025)',
   'Google Vertex AI certification (Oct 2025)',

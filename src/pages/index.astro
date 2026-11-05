@@ -6,10 +6,6 @@ import Thread from '../components/Thread.astro';
 import Hero from '../components/Hero.astro';
 import Receipts from '../components/Receipts.astro';
 import Featured from '../components/Featured.astro';
-import ReplacementChain from '../components/demos/ReplacementChain.astro';
-import LastSpotRace from '../components/demos/LastSpotRace.astro';
-import CrashWorker from '../components/demos/CrashWorker.astro';
-import HourlyLimit from '../components/demos/HourlyLimit.astro';
 import MoreProjects from '../components/MoreProjects.astro';
 import Experience from '../components/Experience.astro';
 import Now from '../components/Now.astro';
@@ -38,31 +34,24 @@ import Footer from '../components/Footer.astro';
         { label: 'Code on GitHub', href: 'https://github.com/harini08k/benchcall' },
       ]}
       image="IMG-03"
-      imageAlt="BenchCall on a phone, roster screen"
-    >
-      <ReplacementChain />
-      <LastSpotRace />
-    </Featured>
+      imageAlt="BenchCall's invite screen on a phone: a ticket for Sunday's badminton game with a share link"
+    />
 
     <Featured
       id="reachinbox"
       name="ReachInbox Scheduler"
-      badges={['Hiring assignment', 'ReachInbox SDE intern']}
+      badges={[]}
       tagline="It sends your email at 3:00. Exactly once. Even if the server crashes at 2:59."
       line="An email scheduler with per-sender hourly limits that survives restarts without losing or doubling a single email."
       stats={['No cron jobs', 'Crash-tested', 'Live Slack alerts']}
       actions={[
-        { label: 'Try the live demo', href: 'https://reachinbox-kohl-alpha.vercel.app', primary: true },
+        { label: 'Watch the demo', href: 'https://youtu.be/bnRbRThotFc', primary: true },
         { label: 'Read the case study', href: '/projects/reachinbox' },
         { label: 'Code on GitHub', href: 'https://github.com/harini08k/reachinbox' },
       ]}
-      note="Free hosting naps when nobody's around. The first click can take 30 to 60 seconds to wake it up."
       image="IMG-05"
-      imageAlt="The ReachInbox dashboard"
-    >
-      <CrashWorker />
-      <HourlyLimit />
-    </Featured>
+      imageAlt="The ReachInbox dashboard, with scheduled emails listed and their send times"
+    />
 
     <MoreProjects />
     <Experience />

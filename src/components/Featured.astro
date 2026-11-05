@@ -28,9 +28,13 @@ const { id, name, badges, tagline, line, stats, actions, note, image, imageAlt }
     <small>Featured project</small>
   </h2>
   <div class="sec-body sec-body--wide">
-    <ul class="chip-row feat__badges">
-      {badges.map((b, i) => <li class={`chip ${i === 0 ? 'chip--award' : ''}`}>{b}</li>)}
-    </ul>
+    {
+      badges.length > 0 && (
+        <ul class="chip-row feat__badges">
+          {badges.map((b, i) => <li class={`chip ${i === 0 ? 'chip--award' : ''}`}>{b}</li>)}
+        </ul>
+      )
+    }
     <p class="feat__tagline">{tagline}</p>
     <div class="feat__grid">
       <div>
@@ -47,9 +51,13 @@ const { id, name, badges, tagline, line, stats, actions, note, image, imageAlt }
         <Photo id={image} alt={imageAlt} />
       </figure>
     </div>
-    <div class="feat__demos">
-      <slot />
-    </div>
+    {
+      Astro.slots.has('default') && (
+        <div class="feat__demos">
+          <slot />
+        </div>
+      )
+    }
   </div>
 </section>
 
@@ -118,6 +126,12 @@ const { id, name, badges, tagline, line, stats, actions, note, image, imageAlt }
 
   .feat__shot {
     margin: 0;
+  }
+
+  .feat__shot img {
+    display: block;
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-m);
   }
 
   .feat__shot .ph {
