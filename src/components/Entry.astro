@@ -20,6 +20,7 @@ const tilt = ((hash % 50) / 10 - 2.5).toFixed(2);
 const day = e.date.toLocaleDateString('en-GB', e.showDay ? { day: 'numeric', month: 'short', timeZone: 'UTC' } : { month: 'short', year: 'numeric', timeZone: 'UTC' });
 const isTodo = (s: string) => s.trim().toUpperCase().startsWith('TODO');
 const photo = e.images[0];
+const photos = e.images; // a moment with 2+ photos becomes a slider
 const typeName = { post: 'Post', moment: 'Moment', log: 'Log', video: 'Video', travel: 'Postcard', thought: 'Thought' }[e.type];
 ---
 
@@ -38,7 +39,22 @@ const typeName = { post: 'Post', moment: 'Moment', log: 'Log', video: 'Video', t
     e.type === 'moment' && (
       <div class="polaroid">
         <span class="tape" aria-hidden="true" />
-        {photo && <Photo id={photo.id} src={photo.src} alt={photo.alt} />}
+        {photos.length > 1 ? (
+          <div class="shots" data-shots role="group" aria-roledescription="carousel" aria-label={`Photos: ${e.title}`}>
+            <div class="shots__track" tabindex="0">
+              {photos.map((p, i) => (
+                <div class="shots__slide" role="group" aria-roledescription="slide" aria-label={`${i + 1} of ${photos.length}`}>
+                  <Photo id={p.id} src={p.src} alt={p.alt} />
+                </div>
+              ))}
+            </div>
+            <button type="button" class="shots__btn shots__btn--prev" data-shots-prev aria-label="Previous photo" disabled></button>
+            <button type="button" class="shots__btn shots__btn--next" data-shots-next aria-label="Next photo"></button>
+            <span class="shots__count" aria-live="polite" data-shots-count>1 / {photos.length}</span>
+          </div>
+        ) : (
+          photo && <Photo id={photo.id} src={photo.src} alt={photo.alt} />
+        )}
         <h3 class="hand-title" id={`e-${entry.id}`}>{e.title}</h3>
         {e.caption && <p class="hand">{e.caption}</p>}
         {e.place && <p class="small">{e.place}</p>}
@@ -229,6 +245,108 @@ const typeName = { post: 'Post', moment: 'Moment', log: 'Log', video: 'Video', t
     width: 100%;
     aspect-ratio: 4 / 3;
     object-fit: cover;
+  }
+
+  /* moment with several photos: a swipeable slider with arrows and a counter */
+  .shots {
+    position: relative;
+  }
+
+  .shots__track {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .shots__track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .shots__track:focus-visible {
+    outline: 2px solid var(--silk);
+    outline-offset: 2px;
+  }
+
+  .shots__slide {
+    flex: 0 0 100%;
+    scroll-snap-align: start;
+  }
+
+  .shots__slide :global(img),
+  .shots__slide :global(.ph) {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  .shots__btn {
+    position: absolute;
+    top: 50%;
+    width: 34px;
+    height: 34px;
+    margin-top: -17px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: rgb(29 33 71 / 0.72);
+    cursor: pointer;
+    transition: background 160ms var(--ease), opacity 160ms var(--ease);
+  }
+
+  .shots__btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 9px;
+    height: 9px;
+    border-top: 2px solid #fff;
+    border-right: 2px solid #fff;
+  }
+
+  .shots__btn--prev {
+    left: 8px;
+  }
+
+  .shots__btn--prev::after {
+    transform: translate(-30%, -50%) rotate(-135deg);
+  }
+
+  .shots__btn--next {
+    right: 8px;
+  }
+
+  .shots__btn--next::after {
+    transform: translate(-70%, -50%) rotate(45deg);
+  }
+
+  .shots__btn:hover:not(:disabled) {
+    background: var(--silk);
+  }
+
+  .shots__btn:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
+
+  .shots__btn:disabled {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .shots__count {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    padding: 2px 9px;
+    border-radius: 999px;
+    background: rgb(29 33 71 / 0.72);
+    color: #fff;
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
   }
 
   /* log: a notebook page */
@@ -509,3 +627,30 @@ const typeName = { post: 'Post', moment: 'Moment', log: 'Log', video: 'Video', t
     color: var(--chalk-2);
   }
 </style>
+
+<script>
+  // Wires every photo slider: arrows scroll one photo, and the counter follows the scroll position (swipe works too).
+  document.querySelectorAll<HTMLElement>('[data-shots]').forEach((box) => {
+    const track = box.querySelector<HTMLElement>('.shots__track')!;
+    const prev = box.querySelector<HTMLButtonElement>('[data-shots-prev]')!;
+    const next = box.querySelector<HTMLButtonElement>('[data-shots-next]')!;
+    const count = box.querySelector<HTMLElement>('[data-shots-count]')!;
+    const total = track.children.length;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    const index = () => Math.round(track.scrollLeft / track.clientWidth);
+    const update = () => {
+      const i = index();
+      count.textContent = `${i + 1} / ${total}`;
+      prev.disabled = i <= 0;
+      next.disabled = i >= total - 1;
+    };
+    const go = (dir: number) =>
+      track.scrollTo({ left: (index() + dir) * track.clientWidth, behavior: reduce.matches ? 'auto' : 'smooth' });
+
+    prev.addEventListener('click', () => go(-1));
+    next.addEventListener('click', () => go(1));
+    track.addEventListener('scroll', update, { passive: true });
+    update();
+  });
+</script>
