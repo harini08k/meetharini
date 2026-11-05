@@ -38,7 +38,7 @@ export const receipts = [
   {
     claim: 'I show up.',
     proof:
-      'Boston Snowflake User Group, Snowflake User Group Chennai, FlutterCon Bangalore, tech conferences, and the **AWS Certified AI Practitioner (AIF-C01)** certification, which I earned in October 2025 just because I was curious.',
+      'Boston Snowflake User Group, Snowflake User Group Chennai, FlutterCon Bangalore, tech conferences, and the **AWS Certified AI Practitioner (AIF-C01)** certification. That one adds the most to my career: it gave me the vocabulary of AI on the cloud (foundation models, RAG, agents, responsible AI) and the judgment to pick the right tool for each job. It is the difference between calling an AI API and designing the system around it.',
     link: { label: 'See them in the scrapbook', href: '/scrapbook/#tech' },
   },
 ];
@@ -126,11 +126,12 @@ export const now = {
 export const timeline = [
   { when: 'Sep 2025', what: 'To-do app', copy: "HTML, CSS, vanilla JS and localStorage. Everyone starts with a to-do app. I'm not above it.", learned: 'State is just data you have to remember to save.', stack: ['HTML', 'CSS', 'JavaScript'] },
   { when: 'Sep 2025', what: 'Feedback dashboard', copy: 'My first real backend: Node, Express and MongoDB, with full CRUD and filters.', learned: 'How a request travels from a form, through an API, into a database and back.', stack: ['Node', 'Express', 'MongoDB'] },
-  { when: 'Oct 2025', what: 'Two certifications', copy: "AWS Certified AI Practitioner and Google's Vertex AI certification. Mostly curiosity.", learned: 'The vocabulary of AI on the cloud: models, RAG, agents, and when to use which.', stack: ['AWS', 'Vertex AI'] },
+  { when: 'Oct 2025', what: 'Google Vertex AI certification', copy: "Google's Vertex AI certification. Mostly curiosity.", learned: null, stack: ['Vertex AI'] },
   { when: 'Late 2025', what: 'First AI apps', copy: 'A Flutter app that summarizes documents with Gemini. Then an agent that changes the app when you complain about it.', learned: 'Calling a model is the easy part. Designing the tools it can use is the real work.', stack: ['Flutter', 'Gemini', 'Firebase'] },
   { when: 'Dec 2025', what: 'FlutterCon and Pixorama', copy: "Built a real-time pixel canvas in a workshop with Serverpod's creator. Got hooked on real-time.", learned: 'Real-time is about agreement: every screen has to show the same truth, even when two people act at once.', stack: ['Serverpod', 'WebSockets'] },
   { when: 'Dec 2025 to Mar 2026', what: 'SpearStreamZ internship', copy: 'Structured training in TypeScript and Vue, finished with a photo gallery built toward their ERP.', learned: 'Small, typed, reusable components beat one giant file every time.', stack: ['TypeScript', 'Vue'] },
   { when: 'Jan to Mar 2026', what: 'Mock Placement Portal', copy: 'Built the core frontend of a results platform 1,000+ students use.', learned: 'Real users find every edge case. Design for them before launch.', stack: ['React', 'OAuth', 'Docker'] },
+  { when: 'Jul 2026', what: 'AWS Certified AI Practitioner', copy: 'Passed the AIF-C01 exam on 4 July. Fun to study, and it changed how I think about AI on the cloud.', learned: 'The vocabulary of AI on the cloud: models, RAG, agents, and when to use which.', stack: ['AWS'] },
   { when: 'Aug 2026', what: 'ReachInbox Scheduler', copy: 'Delayed jobs, atomic rate limits and crash-proof sends. Backend got serious.', learned: 'Make the database the source of truth, then design for the crash before it happens.', stack: ['BullMQ', 'Redis', 'PostgreSQL', 'Next.js'] },
   { when: 'Oct 2026', what: 'BenchCall, 5th place', copy: 'Solo. 1,000+ tests. The last spot can never go to two people.', learned: 'Talk to the user first. And "it worked when I clicked it" isn\'t proof; tests are.', stack: ['Serverpod 4', 'PostgreSQL'] },
   { when: 'Now', what: 'Proctoring and this site', copy: 'Still going.', learned: null, stack: [] },
@@ -140,7 +141,7 @@ export const quickFacts = [
   'Based in Chennai',
   'Bachelor of Engineering in Computer Science at Sri Venkateswara College of Engineering (Anna University), class of 2028',
   'CGPA 8.23',
-  '**AWS Certified AI Practitioner (AIF-C01)**, Oct 2025',
+  '**AWS Certified AI Practitioner (AIF-C01)**, Jul 2026. It taught me the vocabulary of AI on the cloud: models, RAG, agents, and when to use which.',
   'Google Vertex AI certification (Oct 2025)',
   'Member, Snowflake User Group Chennai',
 ];
