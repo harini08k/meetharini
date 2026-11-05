@@ -38,7 +38,7 @@ export const receipts = [
   {
     claim: 'I show up.',
     proof:
-      'Boston Snowflake User Group, Snowflake User Group Chennai, FlutterCon Bangalore, tech conferences, and the **AWS Certified AI Practitioner (AIF-C01)** certification. That one adds the most to my career: it gave me the vocabulary of AI on the cloud (foundation models, RAG, agents, responsible AI) and the judgment to pick the right tool for each job. It is the difference between calling an AI API and designing the system around it.',
+      'Boston Snowflake User Group, Snowflake User Group Chennai, FlutterCon Bangalore, tech conferences, and the little promises I make to myself.\nOne more promise kept. Put in the hours, explored the world of AI on AWS, and earned my **AWS Certified AI Practitioner (AIF-C01)**.\nCuriosity got me started. Showing up got me certified.',
     link: { label: 'See them in the scrapbook', href: '/scrapbook/#tech' },
   },
 ];

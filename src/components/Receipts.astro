@@ -21,7 +21,7 @@ import Emph from './Emph.astro';
                 <span class="receipt__toggle" aria-hidden="true" />
               </summary>
               <div class="receipt__proof">
-                <p><Emph text={r.proof} /></p>
+                {r.proof.split('\n').map((line: string) => <p><Emph text={line} /></p>)}
                 <a href={r.link.href}>{r.link.label}</a>
               </div>
             </details>
