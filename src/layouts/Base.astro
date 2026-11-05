@@ -13,7 +13,7 @@ interface Props {
   profile?: boolean;
 }
 
-const { title = site.title, description = site.description, theme = 'day', profile = false } = Astro.props;
+const { title = site.shortTitle, description = site.description, theme = 'day', profile = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, site.url).toString();
 const ogImage = new URL('/og.png', site.url).toString();
 
@@ -51,7 +51,7 @@ const profileLd = {
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={site.name} />
-    <meta property="og:title" content={title} />
+    <meta property="og:title" content={title === site.shortTitle ? site.title : title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImage} />

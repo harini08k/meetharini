@@ -57,7 +57,7 @@ const links = [
     z-index: 30;
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 28px;
     height: 56px;
     padding: 0 24px 0 20px;
     background: color-mix(in srgb, var(--bg) 86%, transparent);
@@ -69,8 +69,9 @@ const links = [
 
   .nav__name {
     font-weight: 700;
-    font-stretch: 82%;
-    font-size: 1.0625rem;
+    font-stretch: 100%;
+    font-size: 1.3125rem;
+    letter-spacing: -0.015em;
     text-decoration: none;
     white-space: nowrap;
   }
@@ -241,7 +242,7 @@ const links = [
       padding: 0 12px;
     }
     .nav__name {
-      font-size: 1rem;
+      font-size: 1.0625rem;
     }
     .nav__recruiter {
       display: none;
@@ -369,6 +370,22 @@ const links = [
     } catch {}
   }
   btn?.addEventListener('click', () => setRecruiter(btn.getAttribute('aria-pressed') !== 'true'));
+  // The hero card and the summary panel's exit link flip the same switch.
+  document.querySelectorAll('[data-recruiter-trigger]').forEach((t) =>
+    t.addEventListener('click', () => {
+      const turningOn = btn?.getAttribute('aria-pressed') !== 'true';
+      setRecruiter(turningOn);
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const behavior = reduce ? 'auto' : 'smooth';
+      if (turningOn) {
+        const g = document.getElementById('glance');
+        g?.scrollIntoView({ behavior, block: 'start' });
+        g?.focus({ preventScroll: true });
+      } else {
+        window.scrollTo({ top: 0, behavior });
+      }
+    })
+  );
   try {
     if (localStorage.getItem('remember') !== '0' && localStorage.getItem('recruiter') === '1') setRecruiter(true);
   } catch {}
