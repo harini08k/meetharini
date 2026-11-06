@@ -1,6 +1,7 @@
 ---
 import { existsSync } from 'node:fs';
 import { site } from '../data/site';
+import Photo from './Photo.astro';
 
 // The kolam: one unbroken line weaving through a grid of dots,
 // then dropping into the rail as the thread that runs down the whole site.
@@ -52,6 +53,7 @@ const hasResume = existsSync(new URL('../../public/resume.pdf', import.meta.url)
   </div>
 
   <div class="sec-body hero__body">
+    <div class="hero__text">
     <div class="hero__hello">
       <span class="avatar" aria-hidden="true">HK</span>
       <p>Hi, I'm Harini Karthikeyan.</p>
@@ -84,6 +86,11 @@ const hasResume = existsSync(new URL('../../public/resume.pdf', import.meta.url)
     <p class="say-hi__note" aria-live="polite"></p>
 
     <p class="hero__hint">Scroll for the work. Pull the thread at the bottom for the rest of me.</p>
+    </div>
+
+    <figure class="hero__photo">
+      <Photo id="IMG-01" alt="Harini" loading="eager" sizes="(min-width: 960px) 320px, 70vw" />
+    </figure>
   </div>
 </header>
 
@@ -134,7 +141,31 @@ const hasResume = existsSync(new URL('../../public/resume.pdf', import.meta.url)
   }
 
   .hero__body {
-    max-width: 820px;
+    max-width: 1080px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 56px;
+    align-items: center;
+  }
+
+  /* Portrait beside the headline. Straight, with a soft pink offset behind it. */
+  .hero__photo {
+    margin: 0;
+    padding: 10px;
+    border: 1.5px solid var(--ink);
+    border-radius: 18px;
+    background: var(--surface, #fff);
+    box-shadow: 10px 10px 0 var(--silk-tint);
+  }
+
+  .hero__photo :global(img),
+  .hero__photo :global(.ph) {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border-radius: 10px;
   }
 
   .hero__hello {
@@ -277,6 +308,12 @@ const hasResume = existsSync(new URL('../../public/resume.pdf', import.meta.url)
 
     .hero__body {
       grid-column: 2;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 36px;
+    }
+
+    .hero__photo {
+      max-width: 260px;
     }
   }
 </style>
