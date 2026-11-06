@@ -463,7 +463,8 @@ const hasResume = existsSync(new URL('../../public/resume.pdf', import.meta.url)
       const b = navBtn.getBoundingClientRect();
       const h = hero.getBoundingClientRect();
       nudge.style.left = `${Math.round(b.left + b.width / 2 - h.left - 8)}px`;
-      nudge.style.top = `${Math.round(b.bottom - h.top + 8)}px`;
+      // The top bar is fixed, so measure the hero from the top of the page, not from where the page happens to be scrolled.
+      nudge.style.top = `${Math.round(b.bottom + 8 - (h.top + scrollY))}px`;
       nudge.setAttribute('data-ready', '');
     };
     place();
