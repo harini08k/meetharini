@@ -315,8 +315,9 @@ const hasResume = existsSync(new URL('../../public/resume.pdf', import.meta.url)
     /* Small screens: the portrait comes first, smaller, so the headline still shows on the first screen. */
     .hero__photo {
       order: -1;
+      width: 100%;
       max-width: 180px;
-      margin: 0;
+      margin: 0 auto;
       padding: 8px;
       border-radius: 14px;
       box-shadow: 7px 7px 0 var(--silk-tint);
