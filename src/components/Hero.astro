@@ -88,6 +88,14 @@ const hasResume = existsSync(new URL('../../public/resume.pdf', import.meta.url)
     <p class="hero__hint">Scroll for the work. Pull the thread at the bottom for the rest of me.</p>
     </div>
 
+    <button class="hero__nudge" type="button" data-nudge aria-label="Recruiter? Turn on Recruiter mode">
+      <svg class="hero__nudge-arrow" viewBox="0 0 64 60" width="64" height="60" aria-hidden="true">
+        <path class="hero__nudge-line" pathLength="1" d="M62 40 H20 Q8 40 8 28 V5" />
+        <path class="hero__nudge-line hero__nudge-head" pathLength="1" d="M1 12 L8 3 L15 12" />
+      </svg>
+      <span class="hero__nudge-text">Recruiter?<br />Click here.</span>
+    </button>
+
     <figure class="hero__photo">
       <Photo id="IMG-01" alt="Harini" loading="eager" sizes="(min-width: 960px) 320px, 70vw" />
     </figure>
@@ -166,6 +174,101 @@ const hasResume = existsSync(new URL('../../public/resume.pdf', import.meta.url)
     aspect-ratio: 4 / 5;
     object-fit: cover;
     border-radius: 10px;
+  }
+
+
+  /* Handwritten nudge toward the top-bar Recruiter mode button. Desktop only. */
+  .hero__nudge {
+    display: none;
+  }
+
+  @media (min-width: 961px) {
+    .hero__nudge {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 2;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: var(--silk);
+      font-family: var(--hand);
+      font-size: 1.25rem;
+      font-weight: 700;
+      line-height: 1.1;
+      cursor: pointer;
+      visibility: hidden;
+      text-align: left;
+    }
+
+    .hero__nudge[data-ready] {
+      visibility: visible;
+    }
+
+    :global(html[data-recruiter]) .hero__nudge {
+      display: none;
+    }
+
+    .hero__nudge-arrow {
+      display: block;
+      flex: none;
+      overflow: visible;
+    }
+
+    .hero__nudge-line {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .hero__nudge-text {
+      display: block;
+      margin: 0 0 8px;
+      white-space: nowrap;
+    }
+
+    .hero__nudge:hover .hero__nudge-text,
+    .hero__nudge:focus-visible .hero__nudge-text {
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 4px;
+    }
+
+    .hero__nudge:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 6px;
+      border-radius: 6px;
+    }
+  }
+
+  @media (min-width: 961px) and (prefers-reduced-motion: no-preference) {
+    .hero__nudge-text {
+      opacity: 0;
+      animation: nudge-in 500ms var(--ease) 2.7s forwards;
+    }
+
+    .hero__nudge-line {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      animation: draw 700ms var(--ease) 3s forwards;
+    }
+
+    .hero__nudge-head {
+      animation-delay: 3.6s;
+      animation-duration: 300ms;
+    }
+
+    @keyframes nudge-in {
+      to {
+        opacity: 1;
+      }
+    }
   }
 
   .hero__hello {
@@ -348,4 +451,24 @@ const hasResume = existsSync(new URL('../../public/resume.pdf', import.meta.url)
 
   const status = document.querySelector<HTMLElement>('.status');
   status?.querySelector('button')?.addEventListener('click', () => status.classList.toggle('is-open'));
+</script>
+
+<script>
+  // Lines the arrow tip up under the top-bar Recruiter mode button, whatever the window width.
+  const nudge = document.querySelector<HTMLButtonElement>('[data-nudge]');
+  const navBtn = document.querySelector<HTMLButtonElement>('.nav__recruiter');
+  const hero = document.getElementById('top');
+  if (nudge && navBtn && hero) {
+    const place = () => {
+      const b = navBtn.getBoundingClientRect();
+      const h = hero.getBoundingClientRect();
+      nudge.style.left = `${Math.round(b.left + b.width / 2 - h.left - 8)}px`;
+      nudge.style.top = `${Math.round(b.bottom - h.top + 8)}px`;
+      nudge.setAttribute('data-ready', '');
+    };
+    place();
+    addEventListener('resize', place);
+    document.fonts?.ready.then(place);
+    nudge.addEventListener('click', () => navBtn.click());
+  }
 </script>
