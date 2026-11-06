@@ -145,12 +145,12 @@ const hasResume = existsSync(new URL('../../public/resume.pdf', import.meta.url)
     display: grid;
     grid-template-columns: minmax(0, 1fr) 300px;
     gap: 56px;
-    align-items: center;
+    align-items: start;
   }
 
   /* Portrait beside the headline. Straight, with a soft pink offset behind it. */
   .hero__photo {
-    margin: 0;
+    margin: 48px 0 0;
     padding: 10px;
     border: 1.5px solid var(--ink);
     border-radius: 18px;
@@ -314,6 +314,7 @@ const hasResume = existsSync(new URL('../../public/resume.pdf', import.meta.url)
 
     .hero__photo {
       max-width: 260px;
+      margin: 0;
     }
   }
 </style>
