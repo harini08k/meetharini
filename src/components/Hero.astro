@@ -312,9 +312,19 @@ const hasResume = existsSync(new URL('../../public/resume.pdf', import.meta.url)
       gap: 36px;
     }
 
+    /* Small screens: the portrait comes first, smaller, so the headline still shows on the first screen. */
     .hero__photo {
-      max-width: 260px;
+      order: -1;
+      max-width: 180px;
       margin: 0;
+      padding: 8px;
+      border-radius: 14px;
+      box-shadow: 7px 7px 0 var(--silk-tint);
+    }
+
+    .hero__photo :global(img),
+    .hero__photo :global(.ph) {
+      border-radius: 8px;
     }
   }
 </style>
