@@ -57,7 +57,7 @@ const links = [
     z-index: 30;
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 28px;
     height: 56px;
     padding: 0 24px 0 20px;
     background: color-mix(in srgb, var(--bg) 86%, transparent);
@@ -69,8 +69,9 @@ const links = [
 
   .nav__name {
     font-weight: 700;
-    font-stretch: 82%;
-    font-size: 1.0625rem;
+    font-stretch: 100%;
+    font-size: 1.3125rem;
+    letter-spacing: -0.015em;
     text-decoration: none;
     white-space: nowrap;
   }
@@ -111,6 +112,11 @@ const links = [
     color: var(--fg-2);
     font: inherit;
     cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .nav__btn svg {
+    flex-shrink: 0;
   }
 
   .nav__btn:hover,
@@ -241,10 +247,26 @@ const links = [
       padding: 0 12px;
     }
     .nav__name {
-      font-size: 1rem;
+      font-size: 1.0625rem;
     }
     .nav__recruiter {
       display: none;
+    }
+  }
+
+  @media (max-width: 400px) {
+    .nav {
+      gap: 10px;
+      padding: 0 12px;
+    }
+    .nav__name {
+      font-size: 0.95rem;
+    }
+    .nav__tools {
+      gap: 6px;
+    }
+    .nav__btn {
+      padding: 6px 10px;
     }
   }
 
