@@ -318,6 +318,8 @@ const hasResume = existsSync(new URL('../../public/resume.pdf', import.meta.url)
       width: 100%;
       max-width: 180px;
       margin: 0 auto;
+      /* The text column starts after the thread rail, so nudge the frame left to sit in the middle of the screen. */
+      transform: translateX(calc((20px - var(--rail)) / 2));
       padding: 8px;
       border-radius: 14px;
       box-shadow: 7px 7px 0 var(--silk-tint);
